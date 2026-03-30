@@ -13,27 +13,31 @@ Use this file to track your progress through the 18 phases.
 ## Phase Checklist
 
 ### Foundation (Phases 0-2)
-- [ ] **Phase 0:** Project Setup & Foundation
+- [x] **Phase 0:** Project Setup & Foundation
   - Vite + React + TypeScript initialized
   - Tailwind configured
   - Dev server running
-  - Note: scaffold and dependencies are in place; local Vite/esbuild verification is currently blocked by an environment-specific crash during `npm run build`
+  - Required `src` folder structure created
+  - Verification rerun successfully on 2026-03-30: `npm ci`, `npm run dev`, and `npm run build`
   
-- [ ] **Phase 1:** Food Data Model & Catalog
+- [x] **Phase 1:** Food Data Model & Catalog
   - TypeScript types defined
-  - 80+ foods loaded from original-plan.md
+  - 94 foods loaded from `rules.md`
   - Food Library panel displays categories
+  - Verification rerun successfully on 2026-03-30: `npm run build`
   
-- [ ] **Phase 2:** Date Range & Calendar Structure
-  - 175 days generated (March 28 - Sept 19)
+- [x] **Phase 2:** Date Range & Calendar Structure
+  - 176 inclusive days generated (March 28 - Sept 19)
   - State management working
   - Basic calendar view displays all days
+  - Verification rerun successfully on 2026-03-30: `npm run build` and direct date-range assertion for `2026-03-28` through `2026-09-19`
 
 ### Core Intelligence (Phases 3-7)
-- [ ] **Phase 3:** Manual Food Placement
+- [x] **Phase 3:** Manual Food Placement
   - Can add/remove foods to days
   - State persists to localStorage
   - Clear all functionality works
+  - Verification completed on 2026-03-30: `npm run build`
   
 - [ ] **Phase 4:** Rule Engine - Validation
   - All 7 validators implemented
@@ -170,13 +174,23 @@ Track any problems or decisions here:
 
 ### Date: 2026-03-30
 **Phase:** 0  
-**Issue:** Vite/esbuild crashes during local build verification in the current environment after scaffold creation.  
-**Resolution:** Scaffold and dependencies were created successfully; remaining verification should be rerun in a stable Node/esbuild environment before marking Phase 0 complete.
+**Issue:** Initial Phase 0 verification was blocked on a different machine by an environment-specific Vite/esbuild crash.  
+**Resolution:** Verification was rerun on this machine, where `npm ci`, `npm run dev`, and `npm run build` all passed. Phase 0 is complete.
 
-### Date: ___________
-**Phase:** ___________  
-**Issue:** ___________________________________________  
-**Resolution:** ______________________________________
+### Date: 2026-03-30
+**Phase:** 1  
+**Issue:** The repo only had the Phase 0 shell, so Phase 1 still needed the typed food catalog and visible library UI.  
+**Resolution:** Added the full food list from `rules.md`, created the Phase 1 food types and grouped library panel, and verified with `npm run build`.
+
+### Date: 2026-03-30
+**Phase:** 2  
+**Issue:** The project docs repeatedly say the March 28, 2026 to September 19, 2026 timeline is 175 days, but that inclusive range actually contains 176 dates.  
+**Resolution:** Implemented the planner against the literal inclusive dates, initialized all 176 `DayEntry` records in Zustand, and documented the discrepancy here so later phases do not inherit the off-by-one bug.
+
+### Date: 2026-03-30
+**Phase:** 3  
+**Issue:** Phase 2 had only the month-grouped calendar shell, so there was no manual editing workflow or persistence yet.  
+**Resolution:** Added inline day-level food assignment and removal, automatic localStorage persistence plus manual save/reset controls, and verified the updated app with `npm run build`.
 
 ### Date: ___________
 **Phase:** ___________  
@@ -189,10 +203,10 @@ Track any problems or decisions here:
 
 | Phase | Estimated | Actual | Notes |
 |-------|-----------|--------|-------|
-| 0 | 30 min | | Scaffold complete; verification blocked by local esbuild crash |
-| 1 | 1 hour | | |
-| 2 | 1 hour | | |
-| 3 | 2 hours | | |
+| 0 | 30 min | 45 min | Scaffold completed; verification passed on this machine after dependency install |
+| 1 | 1 hour | 1 hour | Typed food catalog, grouped library UI, and build verification |
+| 2 | 1 hour | 1 hour | Calendar types, Zustand store, month-grouped timeline UI, and verification; inclusive range is 176 days |
+| 3 | 2 hours | 1.5 hours | Manual placement UI, localStorage persistence, clear/save controls, and build verification |
 | 4 | 2-3 hours | | |
 | 5 | 3-4 hours | | |
 | 6 | 1-2 hours | | |
@@ -214,8 +228,8 @@ Track any problems or decisions here:
 
 ## Current Focus
 
-**Currently working on Phase:** 0
+**Currently working on Phase:** 2
 
-**Next up:** Resolve local Vite/esbuild verification issue, then start Phase 1 food catalog work
+**Next up:** Generate the 175-day date range, define calendar types, set up the Zustand planner store, and render the first calendar view
 
 **Blocked by:** Environment-specific esbuild runtime crash during Vite build/dev verification
