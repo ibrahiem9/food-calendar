@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-surface": "#0c0f0e",
+              "on-surface-variant": "#5a615d",
+              "error": "#ac3434",
+              "on-error": "#fff7f6",
+              "surface-dim": "#d4dcd7",
+              "surface-container": "#ebefeb",
+              "tertiary-fixed": "#ffa454",
+              "primary-fixed-dim": "#7db6ff",
+              "outline-variant": "#adb3af",
+              "surface-container-low": "#f1f4f1",
+              "on-tertiary-container": "#562c00",
+              "secondary-container": "#dff7e2",
+              "on-primary": "#f8f8ff",
+              "outline": "#767c79",
+              "error-container": "#f56965",
+              "on-secondary-fixed": "#384d3d",
+              "on-primary-fixed": "#00294d",
+              "tertiary": "#914d00",
+              "secondary": "#4f6454",
+              "primary-container": "#98c4ff",
+              "on-error-container": "#65000b",
+              "secondary-fixed-dim": "#d1e9d4",
+              "inverse-on-surface": "#9b9e9b",
+              "on-primary-container": "#003e70",
+              "surface-bright": "#f8faf7",
+              "surface": "#f8faf7",
+              "primary-dim": "#005596",
+              "secondary-dim": "#435848",
+              "primary-fixed": "#98c4ff",
+              "on-secondary-fixed-variant": "#546959",
+              "inverse-primary": "#75aef7",
+              "tertiary-container": "#ffa454",
+              "surface-variant": "#dee4e0",
+              "on-background": "#2d3431",
+              "primary": "#1a61a4",
+              "on-tertiary-fixed": "#361900",
+              "on-secondary": "#e8ffea",
+              "on-primary-fixed-variant": "#00477f",
+              "secondary-fixed": "#dff7e2",
+              "error-dim": "#70030f",
+              "surface-tint": "#1a61a4",
+              "surface-container-lowest": "#ffffff",
+              "on-surface": "#2d3431",
+              "background": "#f8faf7",
+              "tertiary-fixed-dim": "#fa9129",
+              "on-secondary-container": "#4a5f4f",
+              "on-tertiary-fixed-variant": "#633300",
+              "on-tertiary": "#fff7f4",
+              "surface-container-highest": "#dee4e0",
+              "tertiary-dim": "#804300",
+              "surface-container-high": "#e4e9e5"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+        .glass-panel {
+            background: rgba(248, 250, 247, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-background min-h-screen flex overflow-hidden">
+<!-- SideNavBar Component -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-4 z-40 h-screen w-64 bg-[#f1f4f1] dark:bg-slate-800 font-manrope text-sm font-semibold tracking-wide">
+<!-- Header Section -->
+<div class="mb-8 px-2">
+<div class="flex items-center gap-3 mb-1">
+<div class="w-10 h-10 rounded-xl overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="close up profile of a happy 6 month old baby smiling gently with soft natural lighting and neutral nursery background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaYqaSn618xITd5sYM90A_CuXw3B6QepdKqkXX2laM8oOYs-klVYn_L2JsggsFo0njg05o7OLt3s8N_sp0j17ie2ThSjZQ4qrAQkzi6DP0t5wk0uPJv7mqO_V9sbzkhe2--4er2HsBzWnq5NeiyMORmh5lZyvGNfRaP5gRBRnJ4mp2yBfKfJJP_rZRs7UMZ9H5f5DFEKwHej29SMIfaOFnBPaJBQEY-pJSoO_bqo-OJi4aWF-biipBydQ-wnQOcBZS70QlSFv5OKk"/>
+</div>
+<div>
+<h2 class="text-on-background font-bold tracking-tight">Leo's Journey</h2>
+<p class="text-xs text-on-surface-variant font-medium">Month 6 • Introduction Phase</p>
+</div>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 bg-[#ffffff] dark:bg-slate-900 text-[#1a61a4] dark:text-[#98c4ff] rounded-xl px-4 py-3 shadow-sm transition-all duration-200 translate-x-1" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span>Calendar View</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-[#ffffff]/50 transition-all" href="#">
+<span class="material-symbols-outlined">flatware</span>
+<span>Food Library</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-[#ffffff]/50 transition-all" href="#">
+<span class="material-symbols-outlined">fact_check</span>
+<span>Rules Checklist</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-[#ffffff]/50 transition-all" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span>Recipe Planner</span>
+</a>
+</nav>
+<!-- Rules Checklist (Context Specific) -->
+<div class="mt-8 p-4 rounded-xl bg-surface-container-high/50 border border-outline-variant/10">
+<h3 class="text-[10px] uppercase tracking-widest text-outline mb-3">Live Rule Status</h3>
+<ul class="space-y-3">
+<li class="flex items-center justify-between">
+<span class="text-xs text-on-surface-variant">Spacing</span>
+<span class="px-2 py-0.5 rounded-sm bg-secondary-container text-on-secondary-container text-[10px] font-bold">OK</span>
+</li>
+<li class="flex items-center justify-between">
+<span class="text-xs text-on-surface-variant">Allergen Rep.</span>
+<span class="px-2 py-0.5 rounded-sm bg-error-container text-on-error-container text-[10px] font-bold">1 Warning</span>
+</li>
+</ul>
+</div>
+<!-- CTA & Footer -->
+<div class="mt-auto pt-6 space-y-4">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full py-3 font-bold text-sm shadow-md active:scale-95 transition-all">
+                Add New Food
+            </button>
+<div class="pt-4 border-t border-outline-variant/10">
+<a class="flex items-center gap-3 text-slate-500 px-4 py-2 hover:text-primary" href="#">
+<span class="material-symbols-outlined text-lg">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 px-4 py-2 hover:text-primary" href="#">
+<span class="material-symbols-outlined text-lg">help_outline</span>
+<span>Support</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
+<!-- TopAppBar Component -->
+<header class="flex justify-between items-center w-full px-8 h-16 max-w-full bg-[#f8faf7] dark:bg-slate-900 font-manrope tracking-tight text-on-background border-b border-surface-container">
+<div class="flex items-center gap-8">
+<h1 class="text-2xl font-bold text-[#1a61a4] dark:text-[#98c4ff] tracking-tighter">BabyBite Sanctuary</h1>
+<nav class="hidden md:flex gap-6">
+<a class="text-[#1a61a4] dark:text-[#98c4ff] font-bold border-b-2 border-[#1a61a4] pb-1" href="#">Calendar View</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#1a61a4]" href="#">Food Library</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#1a61a4]" href="#">Rules Checklist</a>
+</nav>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex gap-2 mr-4">
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">refresh</span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">ios_share</span>
+</button>
+</div>
+<button class="px-5 py-2 bg-secondary-container text-on-secondary-container rounded-full font-bold text-sm active:scale-95 transition-all">
+                    Export CSV
+                </button>
+<button class="px-5 py-2 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full font-bold text-sm shadow-md active:scale-95 transition-all">
+                    Generate
+                </button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Calendar Section -->
+<div class="flex-1 overflow-y-auto p-8 space-y-6">
+<!-- Validation Summary Banner -->
+<div class="p-4 rounded-xl bg-secondary-container/50 border-l-4 border-secondary flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">verified</span>
+<div>
+<p class="text-sm font-bold text-on-secondary-container">Plan Valid: March 28 - Sept 19</p>
+<p class="text-xs text-on-secondary-container/70">All allergen protocols and spacing rules are satisfied.</p>
+</div>
+</div>
+<button class="text-xs font-bold text-primary flex items-center gap-1">
+                        View Log <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Calendar Controls -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<h2 class="text-3xl font-extrabold tracking-tighter">March 2026</h2>
+<div class="flex bg-surface-container rounded-lg p-1">
+<button class="px-3 py-1 text-sm font-bold text-primary bg-surface-container-lowest rounded shadow-sm">Month</button>
+<button class="px-3 py-1 text-sm font-medium text-on-surface-variant">Week</button>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors border border-outline-variant/20">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors border border-outline-variant/20">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Calendar Grid -->
+<div class="rounded-2xl overflow-hidden border border-outline-variant/10 bg-surface-container-low">
+<div class="calendar-grid bg-surface-container-high/30 border-b border-outline-variant/10">
+<div class="py-3 text-center text-[10px] font-bold uppercase tracking-widest text-outline">Sun</div>
+<div class="py-3 text-center text-[10px] font-bold uppercase tracking-widest text-outline">Mon</div>
+<div class="py-3 text-center text-[10px] font-bold uppercase tracking-widest text-outline">Tue</div>
+<div class="py-3 text-center text-[10px] font-bold uppercase tracking-widest text-outline">Wed</div>
+<div class="py-3 text-center text-[10px] font-bold uppercase tracking-widest text-outline">Thu</div>
+<div class="py-3 text-center text-[10px] font-bold uppercase tracking-widest text-outline">Fri</div>
+<div class="py-3 text-center text-[10px] font-bold uppercase tracking-widest text-outline">Sat</div>
+</div>
+<div class="calendar-grid">
+<!-- Previous Month Fills -->
+<div class="h-32 p-3 bg-surface border-r border-b border-outline-variant/10 opacity-30">
+<span class="text-xs font-medium">25</span>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-b border-outline-variant/10 opacity-30">
+<span class="text-xs font-medium">26</span>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-b border-outline-variant/10 opacity-30">
+<span class="text-xs font-medium">27</span>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-b border-outline-variant/10 opacity-30">
+<span class="text-xs font-medium">28</span>
+</div>
+<!-- March Days -->
+<div class="h-32 p-3 bg-surface border-r border-b border-outline-variant/10 group hover:bg-surface-bright transition-colors">
+<span class="text-xs font-medium">1</span>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-b border-outline-variant/10 group hover:bg-surface-bright transition-colors">
+<span class="text-xs font-medium">2</span>
+<div class="mt-2 space-y-1">
+<div class="flex items-center gap-1 px-2 py-1 bg-surface-container-high rounded-md">
+<span class="material-symbols-outlined text-[14px]">eco</span>
+<span class="text-[10px] font-bold truncate">Avocado</span>
+</div>
+<div class="flex gap-1">
+<span class="px-1.5 py-0.5 rounded-sm bg-secondary-container text-on-secondary-container text-[8px] font-black uppercase">NEW</span>
+</div>
+</div>
+</div>
+<div class="h-32 p-3 bg-surface border-b border-outline-variant/10 group hover:bg-surface-bright transition-colors">
+<span class="text-xs font-medium">3</span>
+<div class="mt-2 space-y-1">
+<div class="flex items-center gap-1 px-2 py-1 bg-surface-container-high rounded-md">
+<span class="material-symbols-outlined text-[14px]">eco</span>
+<span class="text-[10px] font-bold truncate">Avocado</span>
+</div>
+</div>
+</div>
+<!-- Continued Week 2 Row Placeholder -->
+<div class="h-32 p-3 bg-surface border-r border-b border-outline-variant/10">
+<span class="text-xs font-medium">4</span>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-b border-outline-variant/10">
+<span class="text-xs font-medium">5</span>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-b border-outline-variant/10">
+<span class="text-xs font-medium text-error font-bold">6</span>
+<div class="mt-2">
+<div class="flex items-center gap-1 px-2 py-1 bg-error-container text-on-error-container rounded-md">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+<span class="text-[10px] font-bold truncate">Egg Intro</span>
+</div>
+<span class="text-[8px] text-error mt-1 block font-bold">ALLERGEN GAP</span>
+</div>
+</div>
+<div class="h-32 p-3 bg-surface-container-low border-r border-b border-outline-variant/10">
+<span class="text-xs font-medium">7</span>
+</div>
+<div class="h-32 p-3 bg-surface-container-low border-r border-b border-outline-variant/10">
+<span class="text-xs font-medium">8</span>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-b border-outline-variant/10">
+<span class="text-xs font-medium">9</span>
+</div>
+<div class="h-32 p-3 bg-surface border-b border-outline-variant/10">
+<span class="text-xs font-medium text-primary font-black">10</span>
+<div class="mt-2">
+<div class="flex items-center gap-1 px-2 py-1 bg-primary text-on-primary rounded-md ring-2 ring-primary/20">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">nutrition</span>
+<span class="text-[10px] font-bold truncate">Banana</span>
+</div>
+<span class="px-1.5 py-0.5 rounded-sm bg-secondary-container text-on-secondary-container text-[8px] font-black uppercase mt-1 inline-block">NON-ALLERGEN</span>
+</div>
+</div>
+<!-- Large spacer for rest of month -->
+<div class="col-span-7 h-32 flex items-center justify-center bg-surface-container-lowest/50 text-outline text-xs italic tracking-widest uppercase">
+                            March 11 - March 29 hidden for focus
+                        </div>
+<!-- Target Active Row -->
+<div class="h-32 p-3 bg-surface border-r border-outline-variant/10">
+<span class="text-xs font-medium">30</span>
+<div class="mt-2">
+<div class="flex items-center gap-1 px-2 py-1 bg-primary text-on-primary rounded-md shadow-lg scale-105 transform origin-top-left ring-4 ring-primary/10">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">nutrition</span>
+<span class="text-[10px] font-bold truncate">Banana</span>
+</div>
+<div class="mt-2 flex flex-col gap-1">
+<span class="px-1.5 py-0.5 rounded-sm bg-secondary-container text-on-secondary-container text-[8px] font-black uppercase w-fit">NEW</span>
+</div>
+</div>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-outline-variant/10">
+<span class="text-xs font-medium">31</span>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-outline-variant/10 opacity-30">
+<span class="text-xs font-medium">1</span>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-outline-variant/10 opacity-30">
+<span class="text-xs font-medium">2</span>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-outline-variant/10 opacity-30">
+<span class="text-xs font-medium">3</span>
+</div>
+<div class="h-32 p-3 bg-surface border-r border-outline-variant/10 opacity-30">
+<span class="text-xs font-medium">4</span>
+</div>
+<div class="h-32 p-3 bg-surface opacity-30">
+<span class="text-xs font-medium">5</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Day Inspector Panel (Right) -->
+<aside class="w-80 h-full border-l border-outline-variant/15 bg-surface-container-lowest p-6 flex flex-col gap-6 shadow-2xl">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] font-bold uppercase tracking-widest text-outline">Day Inspector</span>
+<button class="text-outline hover:text-on-background"><span class="material-symbols-outlined">close</span></button>
+</div>
+<h3 class="text-xl font-extrabold tracking-tight">Monday, March 30</h3>
+<p class="text-sm text-on-surface-variant">Day 42 of Journey</p>
+</div>
+<div class="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/5">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 rounded-xl bg-primary-container/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">nutrition</span>
+</div>
+<div>
+<p class="text-sm font-black text-on-background">Banana</p>
+<p class="text-xs text-on-surface-variant">Fruit • Soft Mash</p>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-secondary text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<p class="text-xs font-bold text-on-background">Rule Compliant</p>
+<p class="text-[11px] leading-relaxed text-on-surface-variant">Placed 2 days after Avocado to monitor for delayed reactions.</p>
+</div>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-secondary text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<p class="text-xs font-bold text-on-background">No Allergen Risk</p>
+<p class="text-[11px] leading-relaxed text-on-surface-variant">Banana is not classified as a major allergen for Leo’s current profile.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<h4 class="text-xs font-black uppercase tracking-widest text-outline">Preparation Notes</h4>
+<div class="p-4 rounded-xl bg-tertiary-container/10 border border-tertiary-container/20">
+<p class="text-xs italic text-on-tertiary-container leading-relaxed">
+                            "Fork-mash until smooth. Can be mixed with a breastmilk or formula for a thinner consistency if Leo is showing texture resistance."
+                        </p>
+</div>
+</div>
+<div class="mt-auto space-y-2">
+<button class="w-full py-3 bg-surface-container-highest text-on-background rounded-xl font-bold text-sm hover:bg-surface-variant transition-colors">
+                        Edit Schedule
+                    </button>
+<button class="w-full py-3 bg-primary text-on-primary rounded-xl font-bold text-sm shadow-lg shadow-primary/20 active:scale-95 transition-all">
+                        Mark as Completed
+                    </button>
+</div>
+</aside>
+</div>
+</main>
+<!-- Contextual FAB (Suppressed as per rules on dashboard with Sidebar but shown for "Quick Action" consistency if requested, but suppressed here to favor the clean Canvas and sidebar CTA) -->
+</body></html>

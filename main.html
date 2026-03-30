@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Food Library - BabyBite Sanctuary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-surface": "#0c0f0e",
+              "on-surface-variant": "#5a615d",
+              "error": "#ac3434",
+              "on-error": "#fff7f6",
+              "surface-dim": "#d4dcd7",
+              "surface-container": "#ebefeb",
+              "tertiary-fixed": "#ffa454",
+              "primary-fixed-dim": "#7db6ff",
+              "outline-variant": "#adb3af",
+              "surface-container-low": "#f1f4f1",
+              "on-tertiary-container": "#562c00",
+              "secondary-container": "#dff7e2",
+              "on-primary": "#f8f8ff",
+              "outline": "#767c79",
+              "error-container": "#f56965",
+              "on-secondary-fixed": "#384d3d",
+              "on-primary-fixed": "#00294d",
+              "tertiary": "#914d00",
+              "secondary": "#4f6454",
+              "primary-container": "#98c4ff",
+              "on-error-container": "#65000b",
+              "secondary-fixed-dim": "#d1e9d4",
+              "inverse-on-surface": "#9b9e9b",
+              "on-primary-container": "#003e70",
+              "surface-bright": "#f8faf7",
+              "surface": "#f8faf7",
+              "primary-dim": "#005596",
+              "secondary-dim": "#435848",
+              "primary-fixed": "#98c4ff",
+              "on-secondary-fixed-variant": "#546959",
+              "inverse-primary": "#75aef7",
+              "tertiary-container": "#ffa454",
+              "surface-variant": "#dee4e0",
+              "on-background": "#2d3431",
+              "primary": "#1a61a4",
+              "on-tertiary-fixed": "#361900",
+              "on-secondary": "#e8ffea",
+              "on-primary-fixed-variant": "#00477f",
+              "secondary-fixed": "#dff7e2",
+              "error-dim": "#70030f",
+              "surface-tint": "#1a61a4",
+              "surface-container-lowest": "#ffffff",
+              "on-surface": "#2d3431",
+              "background": "#f8faf7",
+              "tertiary-fixed-dim": "#fa9129",
+              "on-secondary-container": "#4a5f4f",
+              "on-tertiary-fixed-variant": "#633300",
+              "on-tertiary": "#fff7f4",
+              "surface-container-highest": "#dee4e0",
+              "tertiary-dim": "#804300",
+              "surface-container-high": "#e4e9e5"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-shadow {
+            box-shadow: 0 8px 32px rgba(45, 52, 49, 0.06);
+        }
+        .glass-nav {
+            background: rgba(248, 250, 247, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-background min-h-screen">
+<!-- SideNavBar (Predicted & Rendered) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-4 z-40 bg-[#f1f4f1] dark:bg-slate-800 h-screen w-64 border-r-0 font-manrope text-sm font-semibold tracking-wide">
+<div class="mb-8 px-4 py-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden">
+<img alt="Leo's Journey" data-alt="Close-up portrait of a happy 6-month-old baby with soft natural lighting and neutral nursery background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHyzZcTqpRbnVCtvsyeHmNiAxo0Df_eYCZQhbuSuLK2nAotpwxYFAhaEA0oSaIo8OvpkiEGHa02q8cpa7gnxDjqySs7kXnXHX9msJip2lObpK8Wt0z1t7S552ZgyVtk9rBVz3Oi-K7pSO21MkZHrW2lb_XfA7XDfXljzW9_FR27L4_BHx6h4o8jAc7JG1NK70NMPg_QM9Qyw3dfGC8R8T6u-mUxFLcdkZ0rrfN8eYNlWoswCWNo6u2EhoGojsvwPfMO8SCtyp174k"/>
+</div>
+<div>
+<h2 class="text-on-background font-bold">Leo's Journey</h2>
+<p class="text-xs text-outline font-medium">Month 6 • Introduction Phase</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-[#ffffff]/50 transition-all" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span>Calendar View</span>
+</a>
+<!-- Active State: Food Library -->
+<a class="flex items-center gap-3 bg-[#ffffff] dark:bg-slate-900 text-[#1a61a4] dark:text-[#98c4ff] rounded-xl px-4 py-3 shadow-sm translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">flatware</span>
+<span>Food Library</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-[#ffffff]/50 transition-all" href="#">
+<span class="material-symbols-outlined">fact_check</span>
+<span>Rules Checklist</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-[#ffffff]/50 transition-all" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span>Recipe Planner</span>
+</a>
+</nav>
+<div class="mt-auto space-y-2 pt-4">
+<button class="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-full font-bold shadow-md hover:opacity-90 transition-opacity mb-4">
+                Add New Food
+            </button>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:bg-[#ffffff]/50 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-2 hover:bg-[#ffffff]/50 transition-all" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span>Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-8 min-h-screen">
+<!-- Top Search Bar Header -->
+<header class="flex justify-between items-end mb-12">
+<div class="max-w-xl flex-1">
+<span class="text-xs font-bold uppercase tracking-widest text-primary mb-2 block">Ingredient Directory</span>
+<h1 class="font-headline text-4xl font-extrabold tracking-tight text-on-background mb-6">Food Library</h1>
+<div class="relative group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline">search</span>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-lowest border-none rounded-2xl editorial-shadow focus:ring-2 focus:ring-primary/20 placeholder:text-outline/60 text-lg transition-all" placeholder="Search ingredients, allergens, or nutrients..." type="text"/>
+</div>
+</div>
+<div class="flex gap-4 pb-1">
+<button class="flex items-center gap-2 px-6 py-3 bg-surface-container-high rounded-full font-semibold text-on-surface-variant hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+<span>Filter</span>
+</button>
+<button class="flex items-center gap-2 px-6 py-3 bg-surface-container-high rounded-full font-semibold text-on-surface-variant hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-sm">sort</span>
+<span>A-Z</span>
+</button>
+</div>
+</header>
+<!-- Bento Grid Layout for Categories -->
+<div class="space-y-16">
+<!-- Allergens Section (Priority Highlight) -->
+<section>
+<div class="flex items-center gap-4 mb-8">
+<div class="w-10 h-10 rounded-xl bg-error-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<h2 class="font-headline text-2xl font-bold tracking-tight">Priority Allergens</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Allergen Card -->
+<div class="bg-surface-container-lowest p-6 rounded-3xl editorial-shadow group hover:translate-y-[-4px] transition-transform">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="p-3 bg-error-container/10 rounded-2xl">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">egg</span>
+</div>
+<div>
+<h3 class="font-bold text-lg">Egg</h3>
+<span class="text-xs font-semibold text-error uppercase tracking-tighter">High Priority</span>
+</div>
+</div>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-sm">INTRODUCED</span>
+</div>
+<div class="mt-6">
+<div class="flex justify-between text-xs font-bold text-outline mb-2">
+<span>WEEKLY TARGET</span>
+<span>1/2 times</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/2 rounded-full"></div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-surface-variant/30 flex justify-between items-center">
+<span class="text-xs text-outline">Last: Tuesday, Oct 24</span>
+<span class="material-symbols-outlined text-primary text-xl">arrow_forward_ios</span>
+</div>
+</div>
+<!-- Allergen Card (Pending) -->
+<div class="bg-surface-container-lowest p-6 rounded-3xl editorial-shadow group border-2 border-dashed border-outline-variant/30 opacity-80">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="p-3 bg-surface-container rounded-2xl">
+<span class="material-symbols-outlined text-outline">nutrition</span>
+</div>
+<div>
+<h3 class="font-bold text-lg">Peanut</h3>
+<span class="text-xs font-semibold text-outline uppercase tracking-tighter">Not Introduced</span>
+</div>
+</div>
+<span class="px-3 py-1 bg-surface-container-high text-outline text-[10px] font-bold rounded-sm">PENDING</span>
+</div>
+<div class="mt-8 flex flex-col items-center justify-center py-4">
+<button class="text-primary font-bold text-sm hover:underline">Schedule Exposure</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Fruits & Vegetables (Asymmetric Grid) -->
+<section>
+<div class="flex items-center gap-4 mb-8">
+<div class="w-10 h-10 rounded-xl bg-secondary-container/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+<h2 class="font-headline text-2xl font-bold tracking-tight">Fresh Produce</h2>
+</div>
+<div class="grid grid-cols-12 gap-6">
+<!-- Large Feature Card -->
+<div class="col-span-12 lg:col-span-7 bg-surface-container-low rounded-[2rem] overflow-hidden flex flex-col md:flex-row editorial-shadow">
+<div class="w-full md:w-2/5 h-48 md:h-auto relative">
+<img alt="Avocado" class="w-full h-full object-cover" data-alt="Close-up of a perfectly ripe sliced avocado on a light stone surface with professional studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPJL1QY-buMR0Y0HbOf1MOQOwm_ZQdfuHt3T4FmZi-H1_upq-iflkNt5_MM5SlF-ptWM2ggWQtd6n3R8Ado8zcSHdyDqE3U1-FBqMLt4-3G23Kgn8nratCCQcL2-RpSiun1Q3BDq-XfLEQ2LD3FWkTGi201SN_i1Y5GbFiQlcRwCYDG7pVemSXP7jDkdRI3zcjc_hpntLfFv7_lGMtwDGhqjXGKAJU9P4w8wn_1X1ayqHam_1pITc5bc25OjMNFph7_T22LyJiY_0"/>
+<div class="absolute top-4 left-4">
+<span class="bg-primary/90 text-white text-[10px] font-bold px-3 py-1 rounded-full backdrop-blur-sm">COMBINATION READY</span>
+</div>
+</div>
+<div class="p-8 flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline text-3xl font-extrabold text-on-background">Avocado</h3>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-sm">INTRODUCED</span>
+</div>
+<p class="text-on-surface-variant mb-6 line-clamp-2">Rich in healthy fats and perfect for smooth purees or baby-led weaning wedges. High in Vitamin E.</p>
+<div class="flex items-center gap-4 text-xs font-bold text-outline">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">calendar_today</span> Oct 12</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">favorite</span> Low Risk</span>
+</div>
+</div>
+</div>
+<!-- Standard Cards -->
+<div class="col-span-12 md:col-span-6 lg:col-span-5 bg-surface-container-lowest p-6 rounded-3xl editorial-shadow">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-2xl bg-surface-variant overflow-hidden">
+<img alt="Broccoli" class="w-full h-full object-cover" data-alt="Fresh vibrant green broccoli florets arranged artistically on a light neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEmmdL1LbAfM4gStxwkpZ1lS4i6yLQPaabVQJigXJDTuS1u6Dom6NZJKjJCLKrZ_ewsy4urYv2NzSUwuNu04dgNOwim1wcQYV109Zh1DfEh5eWR5Qdn7cdqrUK6xv4HotlDFf6l4n5mZnHRU2p5W5818-5who1Lc0VV4acu7dXMFH92Fn0xSjc6kJyf_TTBg3QaO_VDy7WGmXDmHq9qfDS4wBoXu3wXT-dcFweatLDPkjaHj-WJNuHncmRLBkx6-17-vOihA2C2GE"/>
+</div>
+<div>
+<h3 class="font-bold text-lg">Broccoli</h3>
+<p class="text-xs text-outline font-medium">Vegetable</p>
+</div>
+</div>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-sm">INTRODUCED</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-surface-container text-outline-variant text-[10px] font-bold rounded-full">Iron Rich</span>
+<span class="px-3 py-1 bg-surface-container text-outline-variant text-[10px] font-bold rounded-full">Fibre</span>
+</div>
+</div>
+<!-- Repeat Standard Card for visual rhythm -->
+<div class="col-span-12 md:col-span-6 lg:col-span-4 bg-surface-container-lowest p-6 rounded-3xl editorial-shadow">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-2xl bg-surface-variant overflow-hidden">
+<img alt="Sweet Potato" class="w-full h-full object-cover" data-alt="Baked sweet potato halves showing orange flesh on a rustic light ceramic plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAC3s09u2v0dBjaCSz0Ng2Z7neHZGW1QsO2gUXVrOX4QAnLmDZlGQthA-9wpqKsNbsV3Yv_0o39c0jPgoKYQTlGvsARRdZT23IPAJxigVVCWnBGsSUoa7YaMxtN8P6UF7xe9Ziqg5EHDiF8c9ndsrtcxiq-tJWfw6AAgF3mJK023fl7KaQbNRyhYvDVNtMxV1Huk9wvPIvX2hdJ5fNXGzadBKzU5xjgkoCuB348OfWb_B0rKHVBJirw9Q88WCmLFoAbpii8vjj9Daw"/>
+</div>
+<div>
+<h3 class="font-bold text-lg">Sweet Potato</h3>
+<p class="text-xs text-outline font-medium">Starch</p>
+</div>
+</div>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-sm">INTRODUCED</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-3 py-1 rounded-full">COMBINATION READY</span>
+</div>
+</div>
+<div class="col-span-12 md:col-span-6 lg:col-span-4 bg-surface-container-lowest p-6 rounded-3xl editorial-shadow">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-2xl bg-surface-variant overflow-hidden">
+<img alt="Banana" class="w-full h-full object-cover" data-alt="Minimalist shot of single ripe yellow banana against a pale sage green background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCioYD-pVeB6uhXGPeN1aKASAvzAns-quQXmX1LVpnV5yA2hzXmZ8o37b4qWE8n8CF5102qcQ0aJUQyl_ox5Izk8_pDOX_Vya7sic3KrJllrvSqA7fmx_VLkXF5N7Y6OnpeopjUiyoEk3mCh0-uHJghgqtdbIRyWHX4RpxkzWLGWeBz5xtrHnsTtlxHlCYHq1A6XflPfP1QrN5nXeg3r98i1ScoFtBJLdxwEHghtWHDcM6YrE45q8WOL8fjZdf9T6XUk0z_dPwi07U"/>
+</div>
+<div>
+<h3 class="font-bold text-lg">Banana</h3>
+<p class="text-xs text-outline font-medium">Fruit</p>
+</div>
+</div>
+<span class="px-3 py-1 bg-surface-container-high text-outline text-[10px] font-bold rounded-sm">PENDING</span>
+</div>
+<div class="text-xs text-outline-variant italic">Scheduled for Saturday morning</div>
+</div>
+<div class="col-span-12 md:col-span-6 lg:col-span-4 bg-surface-container-lowest p-6 rounded-3xl editorial-shadow">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-2xl bg-surface-variant overflow-hidden">
+<img alt="Chicken" class="w-full h-full object-cover" data-alt="Cooked shredded chicken breast on a clean white surface with natural morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL5Otl0I9ySUdQ_7NwXKW9z-P2JPaVRMhDUcjQyZysXuvOKMi6JDAXUnD3rJWY2xTrE9qGnz-k9qVpaFJYHZwtwgulUREYqIInWJ_UFDwnXUv1YXfnY6o4d1mWG5ONj48sE_9n7A30Mv6_8s-VAt91axdhhg3ormUOSBT5nTXj5dVUo5w3jmOTJzhl89vPGnvyLOHoOE3Pe_SzSAxri5vlF3QPT0DfVgietTNiI8Cdqz9uOdWIZyYVpTTrEv57EzAkmqqZQlE7XaY"/>
+</div>
+<div>
+<h3 class="font-bold text-lg">Chicken</h3>
+<p class="text-xs text-outline font-medium">Protein</p>
+</div>
+</div>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-sm">INTRODUCED</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-3 py-1 rounded-full">COMBINATION READY</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Growth Roadmap Footer/CTA -->
+<section class="bg-inverse-surface text-on-primary p-12 rounded-[3rem] editorial-shadow relative overflow-hidden">
+<div class="relative z-10 max-w-2xl">
+<h2 class="font-headline text-3xl font-extrabold mb-4 tracking-tight">Ready to mix things up?</h2>
+<p class="text-outline-variant text-lg mb-8 leading-relaxed">You've successfully introduced 12 core ingredients. Your recipe planner now has 45 safe combinations available for Leo's age group.</p>
+<div class="flex gap-4">
+<button class="px-8 py-4 bg-primary text-white rounded-full font-bold hover:bg-primary-dim transition-colors">
+                            Open Recipe Planner
+                        </button>
+<button class="px-8 py-4 bg-white/10 text-white rounded-full font-bold backdrop-blur-md hover:bg-white/20 transition-colors">
+                            Explore Collections
+                        </button>
+</div>
+</div>
+<!-- Abstract Decorative Element -->
+<div class="absolute right-[-5%] bottom-[-20%] w-96 h-96 bg-primary/20 rounded-full blur-[100px]"></div>
+</section>
+</div>
+</main>
+<!-- Contextual FAB (Only for Food/Calendar contexts) -->
+<div class="fixed bottom-10 right-10 z-50">
+<button class="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 duration-200 group">
+<span class="material-symbols-outlined text-3xl transition-transform group-hover:rotate-90">add</span>
+</button>
+</div>
+</body></html>
