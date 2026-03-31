@@ -393,8 +393,7 @@ export function InspectorPanel({
             <img
               src={currentVisual.imagePath}
               alt={currentVisual.alt}
-              className={`h-20 w-20 rounded-[1.1rem] object-cover ${currentVisual.imageClassName ?? ""}`}
-              style={currentVisual.imageStyle}
+              className="h-20 w-20 rounded-[1.1rem] object-cover"
             />
             <div>
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">

@@ -139,8 +139,7 @@ function DayCell({
                     src={visual.imagePath}
                     alt=""
                     aria-hidden="true"
-                    className={`h-full w-full rounded-[0.7rem] object-cover ${visual.imageClassName ?? ""}`}
-                    style={visual.imageStyle}
+                    className="h-full w-full rounded-[0.7rem] object-cover"
                   />
                 </div>
                 <div className="min-w-0 flex-1">

@@ -69,8 +69,7 @@ function FeaturedCategoryCard({
         <img
           src={visual.imagePath}
           alt={visual.alt}
-          className={`h-36 w-full rounded-[1.2rem] object-cover ${visual.imageClassName ?? ""}`}
-          style={visual.imageStyle}
+          className="h-36 w-full rounded-[1.2rem] object-cover"
         />
       <p className="mt-4 font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
         {CATEGORY_LABELS[category]}
@@ -124,8 +123,7 @@ function FoodChip({
           src={visual.imagePath}
           alt=""
           aria-hidden="true"
-          className={`h-full w-full rounded-[0.8rem] object-cover ${visual.imageClassName ?? ""}`}
-          style={visual.imageStyle}
+          className="h-full w-full rounded-[0.8rem] object-cover"
         />
       </div>
 
