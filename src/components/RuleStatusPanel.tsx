@@ -1,11 +1,4 @@
-import {
-  endOfWeek,
-  format,
-  isAfter,
-  isBefore,
-  parseISO,
-  startOfWeek,
-} from "date-fns";
+import { endOfWeek, format, isAfter, isBefore, parseISO } from "date-fns";
 import { foods } from "../data/foods";
 import { recipesById } from "../data/recipes";
 import type { DayEntry } from "../types/calendar";
@@ -16,6 +9,7 @@ import { validateCombinationStartDate } from "../validators/validateCombinationS
 import { validateDailyMinimum } from "../validators/validateDailyMinimum";
 import { validateNoConsecutiveNewFoods } from "../validators/validateNoConsecutiveNewFoods";
 import { validateRecipeRestrictions } from "../validators/validateRecipeRestrictions";
+import { validateWeeklyAllergenCadence } from "../validators/validateWeeklyAllergenCadence";
 
 type RuleViolation = {
   date: string;
@@ -34,6 +28,7 @@ type RuleSummary = {
 
 const MAX_VISIBLE_VIOLATIONS = 3;
 const ALLERGEN_FOODS = foods.filter((food) => food.isAllergen);
+const WEEK_OF_PATTERN = /week of (\d{4}-\d{2}-\d{2})/i;
 
 const formatDateLabel = (date: string) => format(parseISO(date), "MMM d");
 
@@ -108,50 +103,40 @@ const getRecipeRestrictionViolations = (days: DayEntry[]) =>
       }),
   );
 
+const countDistinctViolationDays = (violations: RuleViolation[]) =>
+  new Set(violations.map((violation) => violation.date)).size;
+
 const getAllergenMaintenanceViolations = (days: DayEntry[]) => {
   if (days.length === 0) {
     return [];
   }
 
-  const lastDay = parseISO(days[days.length - 1].date);
   const violations: RuleViolation[] = [];
 
   for (const allergen of ALLERGEN_FOODS) {
-    const firstIntroDay = days.find((day) =>
-      day.items.some(
-        (item) => item.foodId === allergen.id && item.isFirstIntroduction,
-      ),
-    );
+    const cadenceResult = validateWeeklyAllergenCadence(days, allergen.id);
 
-    if (!firstIntroDay) {
-      continue;
-    }
+    for (const message of cadenceResult.errors) {
+      const weekOf = message.match(WEEK_OF_PATTERN)?.[1];
+      const weekStart = weekOf ? parseISO(weekOf) : null;
+      const weekEnd = weekStart ? endOfWeek(weekStart, { weekStartsOn: 0 }) : null;
+      const weekDays =
+        weekStart && weekEnd
+          ? days.filter((day) => {
+              const dayDate = parseISO(day.date);
 
-    let weekStart = startOfWeek(parseISO(firstIntroDay.date), { weekStartsOn: 0 });
+              return !isBefore(dayDate, weekStart) && !isAfter(dayDate, weekEnd);
+            })
+          : [];
+      const targetDate = weekDays[0]?.date ?? days[0]?.date;
 
-    while (!isAfter(weekStart, lastDay)) {
-      const weekEnd = endOfWeek(weekStart, { weekStartsOn: 0 });
-      const weekDays = days.filter((day) => {
-        const dayDate = parseISO(day.date);
-
-        return !isBefore(dayDate, weekStart) && !isAfter(dayDate, weekEnd);
-      });
-
-      const appearances = weekDays.filter((day) =>
-        day.items.some((item) => item.foodId === allergen.id),
-      ).length;
-
-      if (appearances < 1 || appearances > 2) {
-        const targetDate = weekDays[0]?.date ?? firstIntroDay.date;
-
-        violations.push({
-          date: targetDate,
-          message: `${allergen.name} appears ${appearances} times in the week of ${format(weekStart, "yyyy-MM-dd")}; required cadence is 1-2 appearances.`,
-        });
+      if (!targetDate) {
+        continue;
       }
 
-      weekStart = startOfWeek(new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000), {
-        weekStartsOn: 0,
+      violations.push({
+        date: targetDate,
+        message,
       });
     }
   }
@@ -160,7 +145,6 @@ const getAllergenMaintenanceViolations = (days: DayEntry[]) => {
 };
 
 const buildRuleSummaries = (days: DayEntry[]): RuleSummary[] => {
-  const validDays = days.filter((day) => day.validation.valid).length;
   const dailyMinimumViolations = getDailyMinimumViolations(days);
   const consecutiveViolations = getNoConsecutiveViolations(days);
   const allergenSpacingViolations = getAllergenSpacingViolations(days);
@@ -168,6 +152,9 @@ const buildRuleSummaries = (days: DayEntry[]): RuleSummary[] => {
   const combinationStartViolations = getCombinationStartViolations(days);
   const combinationIngredientViolations = getCombinationIngredientViolations(days);
   const recipeRestrictionViolations = getRecipeRestrictionViolations(days);
+  const nonEmptyDays = days.filter((day) => day.items.length > 0).length;
+  const daysWithoutConsecutiveConflicts =
+    days.length - countDistinctViolationDays(consecutiveViolations);
 
   return [
     {
@@ -175,7 +162,7 @@ const buildRuleSummaries = (days: DayEntry[]): RuleSummary[] => {
       label: "Daily minimum",
       detail: "Every day needs at least one planned food item.",
       passing: dailyMinimumViolations.length === 0,
-      passingLabel: `${days.length}/${days.length || 1} days populated`,
+      passingLabel: `${nonEmptyDays}/${days.length || 1} days populated`,
       failingLabel: `${dailyMinimumViolations.length} empty day${dailyMinimumViolations.length === 1 ? "" : "s"}`,
       violations: dailyMinimumViolations,
     },
@@ -184,7 +171,7 @@ const buildRuleSummaries = (days: DayEntry[]): RuleSummary[] => {
       label: "No consecutive new foods",
       detail: "A first introduction cannot follow another first introduction on the prior day.",
       passing: consecutiveViolations.length === 0,
-      passingLabel: `${validDays}/${days.length || 1} days clear`,
+      passingLabel: `${daysWithoutConsecutiveConflicts}/${days.length || 1} days clear`,
       failingLabel: `${consecutiveViolations.length} consecutive intro conflict${consecutiveViolations.length === 1 ? "" : "s"}`,
       violations: consecutiveViolations,
     },

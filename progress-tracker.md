@@ -112,6 +112,7 @@ Use this file to track your progress through the 18 phases.
   - All rules displayed with status
   - Clickable violations
   - Compliance score shown
+  - Rule summaries aligned with active validator outputs
   - Verification completed on 2026-03-31: `npm run build`
 
 ### Production (Phases 16-17)
