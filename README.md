@@ -113,6 +113,41 @@ If you're a human developer (not a coding agent):
 3. Test after each phase before moving on
 4. Reference [phase-dependencies.md](phase-dependencies.md) when stuck
 
+## Netlify Deployment
+
+This app is configured for static deployment on Netlify.
+
+### Build Settings
+
+- Build command: `npm run build`
+- Publish directory: `dist`
+
+The repo includes:
+
+- [`netlify.toml`](/home/ubuntu/workspace/personal/food-calendar/netlify.toml) for build and SPA redirect configuration
+- [`public/_redirects`](/home/ubuntu/workspace/personal/food-calendar/public/_redirects) so deep links route back to `index.html`
+
+### Deploy Steps
+
+1. Push the repository to GitHub.
+2. In Netlify, create a new site from that repository.
+3. Confirm the build command is `npm run build`.
+4. Confirm the publish directory is `dist`.
+5. Deploy the site.
+
+### Local Production Verification
+
+```bash
+npm run build
+npm run preview
+```
+
+Then open the preview URL and verify:
+
+- the dashboard loads without console errors
+- calendar routes and refreshes work
+- CSV export, print, generation, and editing still work in production mode
+
 ## 📞 Philosophy
 
 This project demonstrates **incremental development** - building complex apps in small, testable chunks. Each phase:

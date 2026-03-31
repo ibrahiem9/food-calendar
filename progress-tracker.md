@@ -124,10 +124,14 @@ Use this file to track your progress through the 18 phases.
   - Performance optimized
   
 - [ ] **Phase 17:** Netlify Deployment
-  - Production build tested
-  - Deployed to Netlify
-  - Live URL working
-  - All features functional in production
+  - [x] Netlify config added (`netlify.toml`)
+  - [x] SPA redirect file added (`public/_redirects`)
+  - [x] README deployment instructions added
+  - [x] Production build tested
+  - [x] Local preview verified
+  - [ ] Deployed to Netlify
+  - [ ] Live URL working
+  - [ ] All features functional in production
 
 ### Optional (Phase 18)
 - [ ] **Phase 18:** Advanced Features
@@ -218,6 +222,11 @@ Track any problems or decisions here:
 **Phase:** 6  
 **Issue:** The Phase 5 generator only placed first introductions, leaving many dates empty and causing expected daily-minimum validation failures after generation.  
 **Resolution:** Added a repeat-fill pass that backfills each empty day with 1-2 previously introduced foods, wired it into the generation flow, updated the UI copy and badges for NEW vs REPEAT, and verified with `npm run build`.
+
+### Date: 2026-03-31
+**Phase:** 17
+**Issue:** The repo did not yet include Netlify deployment configuration or SPA redirect handling for direct deep links.
+**Resolution:** Added `netlify.toml`, added `public/_redirects`, documented the Netlify deployment flow in `README.md`, verified `npm run build`, confirmed `dist/_redirects` exists, and checked local preview responses for both `/` and a missing route. Actual deployment and live-site verification still need to be completed in Netlify.
 
 ### Date: 2026-03-30
 **Phase:** 7  
