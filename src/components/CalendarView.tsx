@@ -259,11 +259,12 @@ function DayCell({
 
   return (
     <li
+      id={`day-${day.date}`}
       onClick={() => onSelectDay(day.date)}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`rounded-[1.5rem] bg-white/88 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)] transition print-day-card ${
+      className={`scroll-mt-24 rounded-[1.5rem] bg-white/88 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)] transition print-day-card ${
         isDropTarget ? "bg-[#eef5ea] ring-2 ring-[#9eb894]/60" : ""
       } ${selectedDayDate === day.date ? "ring-2 ring-[#7ea279]/70" : ""}`}
     >

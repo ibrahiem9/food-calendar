@@ -4,6 +4,7 @@ import { CombinationPlannerPanel } from "./components/CombinationPlannerPanel";
 import { ConflictResolutionModal } from "./components/ConflictResolutionModal";
 import { FoodLibraryPanel } from "./components/FoodLibraryPanel";
 import { InspectorPanel } from "./components/InspectorPanel";
+import { RuleStatusPanel } from "./components/RuleStatusPanel";
 import { ValidationPanel } from "./components/ValidationPanel";
 import { foods } from "./data/foods";
 import { recipes } from "./data/recipes";
@@ -315,7 +316,7 @@ function App() {
                     Phase Status
                   </p>
                   <p className="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-stone-900">
-                    Phase 14 in app
+                    Phase 15 in app
                   </p>
                   <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
                     The food library now shows live introduction status, weekly
@@ -323,11 +324,11 @@ function App() {
                     top of the Phase 10 conflict-aware editing and undo/redo
                     workflow. CSV export now captures date, foods, new
                     introductions, allergen presence, combination usage, and
-                    validation status, while print mode strips the editing UI
-                    into a month-by-month planner layout that is ready for
-                    black-and-white PDF output alongside the {recipes.length}{" "}
-                    curated recipes already available on the same planner
-                    surface.
+                    validation status, print mode strips the editing UI into a
+                    month-by-month planner layout, and the new rules summary
+                    panel links each active constraint directly back to the
+                    affected day cards alongside the {recipes.length} curated
+                    recipes already available on the same planner surface.
                   </p>
                 </div>
 
@@ -377,6 +378,9 @@ function App() {
           </section>
         ) : null}
 
+        <div data-print-hide>
+          <RuleStatusPanel days={days} onSelectDay={setInspectedDayDate} />
+        </div>
         <div data-print-hide>
           <ValidationPanel days={days} />
         </div>
