@@ -8,6 +8,7 @@ import { ValidationPanel } from "./components/ValidationPanel";
 import { foods } from "./data/foods";
 import { recipes } from "./data/recipes";
 import { usePlannerStore } from "./store/plannerStore";
+import { downloadPlannerCsv } from "./utils/csvExport";
 
 function App() {
   const days = usePlannerStore((state) => state.days);
@@ -137,6 +138,16 @@ function App() {
     setSaveMessage("Calendar reset");
   };
 
+  const handleExportCsv = () => {
+    const exported = downloadPlannerCsv({ days, foods });
+
+    setSaveMessage(
+      exported
+        ? `Exported ${days.length} days to CSV`
+        : "Nothing to export yet. Add foods or generate the calendar first.",
+    );
+  };
+
   const handleAddFood = (date: string, foodId: string) => {
     const result = requestAddFoodToDay(date, foodId);
 
@@ -252,6 +263,13 @@ function App() {
                 </button>
                 <button
                   type="button"
+                  onClick={handleExportCsv}
+                  className="rounded-full bg-[#dfe9df] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#d5e1d4]"
+                >
+                  Export CSV
+                </button>
+                <button
+                  type="button"
                   onClick={undo}
                   disabled={!canUndo}
                   className="rounded-full bg-[#ecefe9] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#e3e7e1] disabled:cursor-not-allowed disabled:opacity-45"
@@ -270,7 +288,7 @@ function App() {
 
               <div className="min-h-[1.5rem] font-sans text-sm text-stone-500">
                 {saveMessage ||
-                  "Generation auto-saves, fills every empty day, and now schedules allergen maintenance across Sunday-Saturday weeks."}
+                  "Generation auto-saves, fills every empty day, schedules allergen maintenance across Sunday-Saturday weeks, and exports the working plan as CSV."}
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
@@ -279,14 +297,16 @@ function App() {
                     Phase Status
                   </p>
                   <p className="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-stone-900">
-                    Phase 11 in app
+                    Phase 13 in app
                   </p>
                   <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
                     The food library now shows live introduction status, weekly
                     allergen due state, text search, and drag-to-calendar on
                     top of the Phase 10 conflict-aware editing and undo/redo
-                    workflow. The app still ships with {recipes.length} curated
-                    recipes on the same rule-aware planner surface.
+                    workflow. CSV export now captures date, foods, new
+                    introductions, allergen presence, combination usage, and
+                    validation status alongside the {recipes.length} curated
+                    recipes already available on the same planner surface.
                   </p>
                 </div>
 

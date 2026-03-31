@@ -96,10 +96,11 @@ Use this file to track your progress through the 18 phases.
   - "Why?" buttons work
   - Verification completed on 2026-03-31: `npm run build`
   
-- [ ] **Phase 13:** CSV Export
+- [x] **Phase 13:** CSV Export
   - Export button downloads CSV
   - File opens correctly in spreadsheet apps
   - All data properly formatted
+  - Verification completed on 2026-03-31: `npm run build`
   
 - [ ] **Phase 14:** Print Layout & PDF Support
   - Print stylesheet working
@@ -149,7 +150,7 @@ After completing core phases, verify:
 - [x] Calendar generation produces no errors
 - [x] All foods introduced at least once
 - [x] All rules passing (green checkmarks)
-- [ ] Can export and review full calendar
+- [x] Can export and review full calendar
 
 ### After Phase 10
 - [x] Can manually edit any day
@@ -218,7 +219,12 @@ Track any problems or decisions here:
 ### Date: 2026-03-30
 **Phase:** 7  
 **Issue:** The Phase 6 generator could fill empty days, but weekly allergen maintenance still needed deterministic scheduling and visible cadence status to keep the generated plan fully compliant.  
-**Resolution:** Reworked first-introduction pacing to reserve room for allergen follow-up, added a weekly allergen repetition pass plus cadence summaries in the calendar UI, and verified with `npm run build` and a direct planner generation check showing 94 foods scheduled across all 176 days with zero validation errors.
+**Resolution:** Added weekly allergen repetition scheduling, surfaced cadence state in the planner UI, and verified generation with zero validation errors.
+
+### Date: 2026-03-31
+**Phase:** 13  
+**Issue:** The planner could generate and edit a full schedule, but there was no export path for reviewing the calendar in spreadsheet tools or sharing it outside the browser.  
+**Resolution:** Added a client-side CSV exporter with a header action, exported columns for date, foods, new introductions, allergens, combination usage, and validation state, and verified the implementation with `npm run build`.
 
 ### Date: 2026-03-31
 **Phase:** 10  
