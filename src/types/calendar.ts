@@ -5,7 +5,14 @@ export interface PlannedItem {
   type: PlannedItemType;
   label: string;
   isFirstIntroduction: boolean;
+  recipeId?: string;
   ingredientFoodIds?: string[];
+}
+
+export interface CombinationPlannedItem extends PlannedItem {
+  type: "combination";
+  recipeId: string;
+  ingredientFoodIds: string[];
 }
 
 export interface ValidationResult {

@@ -1,15 +1,7 @@
+import type { Recipe } from "../types/recipe";
 import { createValidationResult } from "./validationUtils";
 
-interface RecipeForValidation {
-  name: string;
-  forbiddenFlags: {
-    addedSodium: boolean;
-    addedSugar: boolean;
-    hotSpices: boolean;
-  };
-}
-
-export const validateRecipeRestrictions = (recipe: RecipeForValidation) => {
+export const validateRecipeRestrictions = (recipe: Recipe) => {
   const prohibitedIngredients = [
     recipe.forbiddenFlags.addedSodium ? "sodium" : null,
     recipe.forbiddenFlags.addedSugar ? "sugar" : null,

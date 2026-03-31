@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { CalendarView } from "./components/CalendarView";
 import { FoodLibraryPanel } from "./components/FoodLibraryPanel";
 import { ValidationPanel } from "./components/ValidationPanel";
+import { recipes } from "./data/recipes";
 import { usePlannerStore } from "./store/plannerStore";
 
 function App() {
@@ -127,12 +128,13 @@ function App() {
                     Phase Status
                   </p>
                   <p className="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-stone-900">
-                    Phase 7 in app
+                    Phase 8 in app
                   </p>
                   <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
-                    Auto-generation now reserves space for allergen
-                    maintenance, fills remaining gaps with repeat foods, and
-                    tracks weekly cadence status directly in the calendar.
+                    Combination recipes are now modeled as first-class planner
+                    data. The app ships with {recipes.length} curated recipes,
+                    tracked ingredient IDs, and restriction flags that phase 9
+                    can validate before any combo is scheduled.
                   </p>
                 </div>
 
