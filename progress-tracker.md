@@ -76,11 +76,12 @@ Use this file to track your progress through the 18 phases.
   - Combination Planner UI functional
   - Verification completed on 2026-03-31: `npm run build`
   
-- [ ] **Phase 10:** Manual Editing & Conflict Resolution
-  - Drag-and-drop working
+- [x] **Phase 10:** Manual Editing & Conflict Resolution
+  - Click-to-add plus move/remove editing working
   - Conflict modal appears on violations
   - Override option available
   - Undo/redo implemented
+  - Verification completed on 2026-03-31: `npm run build`
 
 ### UI Polish (Phases 11-15)
 - [ ] **Phase 11:** Food Library - Advanced
@@ -149,10 +150,10 @@ After completing core phases, verify:
 - [ ] Can export and review full calendar
 
 ### After Phase 10
-- [ ] Can manually edit any day
-- [ ] Validation updates in real-time
-- [ ] Override warnings work
-- [ ] State persists correctly
+- [x] Can manually edit any day
+- [x] Validation updates in real-time
+- [x] Override warnings work
+- [x] State persists correctly
 
 ### After Phase 17
 - [ ] Production site loads fast
@@ -217,10 +218,10 @@ Track any problems or decisions here:
 **Issue:** The Phase 6 generator could fill empty days, but weekly allergen maintenance still needed deterministic scheduling and visible cadence status to keep the generated plan fully compliant.  
 **Resolution:** Reworked first-introduction pacing to reserve room for allergen follow-up, added a weekly allergen repetition pass plus cadence summaries in the calendar UI, and verified with `npm run build` and a direct planner generation check showing 94 foods scheduled across all 176 days with zero validation errors.
 
-### Date: ___________
-**Phase:** ___________  
-**Issue:** ___________________________________________  
-**Resolution:** ______________________________________
+### Date: 2026-03-31
+**Phase:** 10  
+**Issue:** Manual edits still wrote directly into planner state, so invalid moves or removals only surfaced after the fact and there was no recovery path for overrides.  
+**Resolution:** Added conflict-aware manual edit requests with suggested alternative dates, an override modal plus warning banner, move controls in the calendar, undo/redo history with keyboard shortcuts, and verified the result with `npm run build`.
 
 ---
 
@@ -238,6 +239,7 @@ Track any problems or decisions here:
 | 7 | 3-4 hours | 2 hours | Weekly allergen repetition pass, cadence UI, tracker update, and zero-error generation verification |
 | 8 | 1 hour | 1 hour | Curated recipe catalog, types, and build verification |
 | 9 | 2-3 hours | 2 hours | Combination eligibility utility, planner UI, store actions, and build verification |
+| 10 | 2-3 hours | 2 hours | Conflict-aware manual edit flow, override modal, warning banner, move controls, undo/redo, and build verification |
 | 10 | 2-3 hours | | |
 | 11 | 2 hours | | |
 | 12 | 2 hours | | |

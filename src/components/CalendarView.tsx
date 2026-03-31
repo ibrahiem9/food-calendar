@@ -158,17 +158,25 @@ function DayCell({
   day,
   days,
   onAddFood,
+  onMovePlannedItem,
   onRemovePlannedItem,
 }: {
   day: DayEntry;
   days: DayEntry[];
   onAddFood: (date: string, foodId: string) => void;
+  onMovePlannedItem: (
+    sourceDate: string,
+    itemIndex: number,
+    targetDate: string,
+  ) => void;
   onRemovePlannedItem: (date: string, itemIndex: number) => void;
 }) {
   const parsedDate = parseISO(day.date);
   const [selectedFoodId, setSelectedFoodId] = useState("");
   const [selectedCategory, setSelectedCategory] =
     useState<FoodCategory>("fruit");
+  const [activeMoveIndex, setActiveMoveIndex] = useState<number | null>(null);
+  const [moveTargetDate, setMoveTargetDate] = useState(day.date);
 
   const availableFoods = foodsByCategory[selectedCategory];
   const validationStatus = getValidationStatus(day);
@@ -194,6 +202,23 @@ function DayCell({
     }
 
     onAddFood(day.date, selectedFoodId);
+  };
+
+  const handleStartMove = (itemIndex: number) => {
+    const currentIndex = days.findIndex((entry) => entry.date === day.date);
+    const nextDate = days[currentIndex + 1]?.date ?? days[currentIndex - 1]?.date ?? day.date;
+
+    setActiveMoveIndex(itemIndex);
+    setMoveTargetDate(nextDate);
+  };
+
+  const handleMoveItem = () => {
+    if (activeMoveIndex === null || !moveTargetDate) {
+      return;
+    }
+
+    onMovePlannedItem(day.date, activeMoveIndex, moveTargetDate);
+    setActiveMoveIndex(null);
   };
 
   return (
@@ -282,11 +307,47 @@ function DayCell({
 
                     <button
                       type="button"
+                      onClick={() => handleStartMove(index)}
+                      className="rounded-full bg-[#ecefe9] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-700 transition hover:bg-[#e3e7e1]"
+                    >
+                      Move
+                    </button>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
                       onClick={() => onRemovePlannedItem(day.date, index)}
                       className="rounded-full bg-[#f5ddd4] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-800 transition hover:bg-[#efcdbf]"
                     >
                       Remove
                     </button>
+                    {activeMoveIndex === index ? (
+                      <>
+                        <input
+                          type="date"
+                          value={moveTargetDate}
+                          min={days[0]?.date}
+                          max={days[days.length - 1]?.date}
+                          onChange={(event) => setMoveTargetDate(event.target.value)}
+                          className="rounded-full bg-[#f6f8f5] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-stone-700 outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleMoveItem}
+                          className="rounded-full bg-[linear-gradient(135deg,_#7ea279,_#b9cfa8)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-900 shadow-[0_8px_32px_rgba(45,52,49,0.06)] transition hover:brightness-[1.02]"
+                        >
+                          Apply Move
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveMoveIndex(null)}
+                          className="rounded-full bg-[#ecefe9] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-700 transition hover:bg-[#e3e7e1]"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : null}
                   </div>
                 </li>
               );
@@ -425,10 +486,16 @@ function DayCell({
 export function CalendarView({
   days,
   onAddFood,
+  onMovePlannedItem,
   onRemovePlannedItem,
 }: {
   days: DayEntry[];
   onAddFood: (date: string, foodId: string) => void;
+  onMovePlannedItem: (
+    sourceDate: string,
+    itemIndex: number,
+    targetDate: string,
+  ) => void;
   onRemovePlannedItem: (date: string, itemIndex: number) => void;
 }) {
   const months = useMemo(() => groupDaysByMonth(days), [days]);
@@ -499,12 +566,13 @@ export function CalendarView({
             </p>
             <div className="space-y-2">
               <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Phase 9 calendar coverage across all {days.length} calendar days
+                Phase 10 calendar editing across all {days.length} calendar days
               </h2>
               <p className="font-sans text-sm leading-7 text-stone-700">
-                Single foods and validated combination recipes now live in the
-                same timeline, so manual edits, recipe planning, and automated
-                generation all surface through one rule-aware calendar.
+                Single foods and validated combination recipes still share one
+                timeline, but manual edits now route through conflict checks,
+                alternative date suggestions, and undoable history before they
+                become part of the saved plan.
               </p>
             </div>
           </div>
@@ -583,6 +651,7 @@ export function CalendarView({
                     day={day}
                     days={days}
                     onAddFood={onAddFood}
+                    onMovePlannedItem={onMovePlannedItem}
                     onRemovePlannedItem={onRemovePlannedItem}
                   />
                 ))}

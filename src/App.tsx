@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { CalendarView } from "./components/CalendarView";
 import { CombinationPlannerPanel } from "./components/CombinationPlannerPanel";
+import { ConflictResolutionModal } from "./components/ConflictResolutionModal";
 import { FoodLibraryPanel } from "./components/FoodLibraryPanel";
 import { ValidationPanel } from "./components/ValidationPanel";
 import { recipes } from "./data/recipes";
@@ -9,9 +10,30 @@ import { usePlannerStore } from "./store/plannerStore";
 function App() {
   const days = usePlannerStore((state) => state.days);
   const initializeDays = usePlannerStore((state) => state.initializeDays);
-  const addFoodToDay = usePlannerStore((state) => state.addFoodToDay);
+  const requestAddFoodToDay = usePlannerStore((state) => state.requestAddFoodToDay);
   const addRecipeToDay = usePlannerStore((state) => state.addRecipeToDay);
-  const removePlannedItem = usePlannerStore((state) => state.removePlannedItem);
+  const requestRemovePlannedItem = usePlannerStore(
+    (state) => state.requestRemovePlannedItem,
+  );
+  const requestMovePlannedItem = usePlannerStore(
+    (state) => state.requestMovePlannedItem,
+  );
+  const pendingConflict = usePlannerStore((state) => state.pendingConflict);
+  const confirmPendingConflict = usePlannerStore(
+    (state) => state.confirmPendingConflict,
+  );
+  const dismissPendingConflict = usePlannerStore(
+    (state) => state.dismissPendingConflict,
+  );
+  const applyConflictSuggestion = usePlannerStore(
+    (state) => state.applyConflictSuggestion,
+  );
+  const warningBanner = usePlannerStore((state) => state.warningBanner);
+  const clearWarningBanner = usePlannerStore((state) => state.clearWarningBanner);
+  const canUndo = usePlannerStore((state) => state.canUndo);
+  const canRedo = usePlannerStore((state) => state.canRedo);
+  const undo = usePlannerStore((state) => state.undo);
+  const redo = usePlannerStore((state) => state.redo);
   const generateFirstIntroductions = usePlannerStore(
     (state) => state.generateFirstIntroductions,
   );
@@ -37,12 +59,33 @@ function App() {
     day.items.some((item) => item.isFirstIntroduction),
   ).length;
   const populatedDays = days.filter((day) => day.items.length > 0).length;
+  const hasValidationErrors = days.some((day) => day.validation.errors.length > 0);
 
   useEffect(() => {
     if (days.length === 0) {
       initializeDays();
     }
   }, [days.length, initializeDays]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== "z") {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (event.shiftKey) {
+        redo();
+        return;
+      }
+
+      undo();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [redo, undo]);
 
   useEffect(() => {
     if (!saveMessage) {
@@ -58,7 +101,9 @@ function App() {
 
   const handleSave = () => {
     savePlan();
-    setSaveMessage("Plan saved locally");
+    setSaveMessage(
+      hasValidationErrors ? "Plan saved locally with warnings" : "Plan saved locally",
+    );
   };
 
   const handleGenerate = () => {
@@ -74,6 +119,72 @@ function App() {
   const handleClearAll = () => {
     clearAllDays();
     setSaveMessage("Calendar reset");
+  };
+
+  const handleAddFood = (date: string, foodId: string) => {
+    const result = requestAddFoodToDay(date, foodId);
+
+    if (result.applied) {
+      setSaveMessage(`Food added to ${date}`);
+      return;
+    }
+
+    if (result.reason && !result.requiresConfirmation) {
+      setSaveMessage(result.reason);
+    }
+  };
+
+  const handleRemovePlannedItem = (date: string, itemIndex: number) => {
+    const result = requestRemovePlannedItem(date, itemIndex);
+
+    if (result.applied) {
+      setSaveMessage(`Item removed from ${date}`);
+      return;
+    }
+
+    if (result.reason && !result.requiresConfirmation) {
+      setSaveMessage(result.reason);
+    }
+  };
+
+  const handleMovePlannedItem = (
+    sourceDate: string,
+    itemIndex: number,
+    targetDate: string,
+  ) => {
+    const result = requestMovePlannedItem(sourceDate, itemIndex, targetDate);
+
+    if (result.applied) {
+      setSaveMessage(`Item moved to ${targetDate}`);
+      return;
+    }
+
+    if (result.reason && !result.requiresConfirmation) {
+      setSaveMessage(result.reason);
+    }
+  };
+
+  const handleUseConflictSuggestion = (date: string) => {
+    const result = applyConflictSuggestion(date);
+
+    if (result.applied) {
+      setSaveMessage(`Applied suggested date ${date}`);
+      return;
+    }
+
+    if (result.reason && !result.requiresConfirmation) {
+      setSaveMessage(result.reason);
+    }
+  };
+
+  const handleConfirmConflict = () => {
+    confirmPendingConflict();
+    setSaveMessage("Edit applied with warnings");
+  };
+
+  const handleCancelConflict = () => {
+    dismissPendingConflict();
+    setSaveMessage("Edit cancelled");
   };
 
   return (
@@ -114,7 +225,7 @@ function App() {
                   onClick={handleSave}
                   className="rounded-full bg-[#ecefe9] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#e3e7e1]"
                 >
-                  Save Plan
+                  {hasValidationErrors ? "Save with Warnings" : "Save Plan"}
                 </button>
                 <button
                   type="button"
@@ -122,6 +233,22 @@ function App() {
                   className="rounded-full bg-[#f1e2da] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#ecd6cb]"
                 >
                   Clear All Days
+                </button>
+                <button
+                  type="button"
+                  onClick={undo}
+                  disabled={!canUndo}
+                  className="rounded-full bg-[#ecefe9] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#e3e7e1] disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  Undo
+                </button>
+                <button
+                  type="button"
+                  onClick={redo}
+                  disabled={!canRedo}
+                  className="rounded-full bg-[#ecefe9] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#e3e7e1] disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  Redo
                 </button>
               </div>
 
@@ -136,14 +263,13 @@ function App() {
                     Phase Status
                   </p>
                   <p className="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-stone-900">
-                    Phase 9 in app
+                    Phase 10 in app
                   </p>
                   <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
-                    Combination recipes now have a scheduling surface, shared
-                    eligibility checks, and rule-aware insertion into the same
-                    planner state as single-food items. The app ships with{" "}
-                    {recipes.length} curated recipes ready for day-by-day
-                    validation.
+                    Manual adds, removals, and moves now pass through
+                    conflict-aware validation, suggested alternative dates, and
+                    undo/redo history. The app still ships with {recipes.length}{" "}
+                    curated recipes on the same rule-aware planner surface.
                   </p>
                 </div>
 
@@ -168,15 +294,44 @@ function App() {
           </div>
         </header>
 
+        {warningBanner ? (
+          <section className="rounded-[1.75rem] bg-[#f4e0d5] p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-600">
+                  Warning Banner
+                </p>
+                <p className="mt-2 font-sans text-sm leading-7 text-stone-800">
+                  {warningBanner}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={clearWarningBanner}
+                className="rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-stone-700 transition hover:bg-white"
+              >
+                Dismiss
+              </button>
+            </div>
+          </section>
+        ) : null}
+
         <ValidationPanel days={days} />
         <CombinationPlannerPanel days={days} onAddRecipe={addRecipeToDay} />
         <CalendarView
           days={days}
-          onAddFood={addFoodToDay}
-          onRemovePlannedItem={removePlannedItem}
+          onAddFood={handleAddFood}
+          onMovePlannedItem={handleMovePlannedItem}
+          onRemovePlannedItem={handleRemovePlannedItem}
         />
         <FoodLibraryPanel />
       </div>
+      <ConflictResolutionModal
+        conflict={pendingConflict}
+        onCancel={handleCancelConflict}
+        onConfirm={handleConfirmConflict}
+        onUseSuggestion={handleUseConflictSuggestion}
+      />
     </main>
   );
 }
