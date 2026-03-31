@@ -6,7 +6,7 @@ import {
   parseISO,
   startOfWeek,
 } from "date-fns";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type DragEvent } from "react";
 import { foods, foodsByCategory } from "../data/foods";
 import type { DayEntry } from "../types/calendar";
 import { FOOD_CATEGORIES, type FoodCategory } from "../types/food";
@@ -177,6 +177,7 @@ function DayCell({
     useState<FoodCategory>("fruit");
   const [activeMoveIndex, setActiveMoveIndex] = useState<number | null>(null);
   const [moveTargetDate, setMoveTargetDate] = useState(day.date);
+  const [isDropTarget, setIsDropTarget] = useState(false);
 
   const availableFoods = foodsByCategory[selectedCategory];
   const validationStatus = getValidationStatus(day);
@@ -221,8 +222,42 @@ function DayCell({
     setActiveMoveIndex(null);
   };
 
+  const handleDragOver = (event: DragEvent<HTMLLIElement>) => {
+    if (!event.dataTransfer.types.includes("text/plain")) {
+      return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+    setIsDropTarget(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDropTarget(false);
+  };
+
+  const handleDrop = (event: DragEvent<HTMLLIElement>) => {
+    event.preventDefault();
+    const draggedFoodId = event.dataTransfer.getData("text/plain");
+
+    setIsDropTarget(false);
+
+    if (!draggedFoodId) {
+      return;
+    }
+
+    onAddFood(day.date, draggedFoodId);
+  };
+
   return (
-    <li className="rounded-[1.5rem] bg-white/88 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
+    <li
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      className={`rounded-[1.5rem] bg-white/88 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)] transition ${
+        isDropTarget ? "bg-[#eef5ea] ring-2 ring-[#9eb894]/60" : ""
+      }`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
@@ -253,7 +288,11 @@ function DayCell({
           <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
             Planned Items
           </p>
-          {day.items.length > 0 ? (
+          {isDropTarget ? (
+            <p className="font-sans text-xs text-stone-600">
+              Release to add from library
+            </p>
+          ) : day.items.length > 0 ? (
             <p className="font-sans text-xs text-stone-500">
               First intro flags update automatically
             </p>
@@ -570,9 +609,9 @@ export function CalendarView({
               </h2>
               <p className="font-sans text-sm leading-7 text-stone-700">
                 Single foods and validated combination recipes still share one
-                timeline, but manual edits now route through conflict checks,
-                alternative date suggestions, and undoable history before they
-                become part of the saved plan.
+                timeline, and day cards now accept direct drops from the food
+                library while manual edits continue to route through conflict
+                checks, alternative date suggestions, and undoable history.
               </p>
             </div>
           </div>

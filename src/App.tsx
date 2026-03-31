@@ -263,13 +263,14 @@ function App() {
                     Phase Status
                   </p>
                   <p className="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-stone-900">
-                    Phase 10 in app
+                    Phase 11 in app
                   </p>
                   <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
-                    Manual adds, removals, and moves now pass through
-                    conflict-aware validation, suggested alternative dates, and
-                    undo/redo history. The app still ships with {recipes.length}{" "}
-                    curated recipes on the same rule-aware planner surface.
+                    The food library now shows live introduction status, weekly
+                    allergen due state, text search, and drag-to-calendar on
+                    top of the Phase 10 conflict-aware editing and undo/redo
+                    workflow. The app still ships with {recipes.length} curated
+                    recipes on the same rule-aware planner surface.
                   </p>
                 </div>
 
@@ -324,7 +325,7 @@ function App() {
           onMovePlannedItem={handleMovePlannedItem}
           onRemovePlannedItem={handleRemovePlannedItem}
         />
-        <FoodLibraryPanel />
+        <FoodLibraryPanel days={days} />
       </div>
       <ConflictResolutionModal
         conflict={pendingConflict}
