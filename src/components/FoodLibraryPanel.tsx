@@ -66,11 +66,12 @@ function FeaturedCategoryCard({
       onClick={() => onFocus(category)}
       className={`overflow-hidden rounded-[1.6rem] bg-gradient-to-br ${visual.accentClassName} p-4 text-left shadow-[0_8px_32px_rgba(45,52,49,0.06)] transition hover:translate-y-[-1px]`}
     >
-      <img
-        src={visual.imagePath}
-        alt={visual.alt}
-        className="h-36 w-full rounded-[1.2rem] object-cover"
-      />
+        <img
+          src={visual.imagePath}
+          alt={visual.alt}
+          className={`h-36 w-full rounded-[1.2rem] object-cover ${visual.imageClassName ?? ""}`}
+          style={visual.imageStyle}
+        />
       <p className="mt-4 font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
         {CATEGORY_LABELS[category]}
       </p>
@@ -123,7 +124,8 @@ function FoodChip({
           src={visual.imagePath}
           alt=""
           aria-hidden="true"
-          className="h-full w-full rounded-[0.8rem] object-cover"
+          className={`h-full w-full rounded-[0.8rem] object-cover ${visual.imageClassName ?? ""}`}
+          style={visual.imageStyle}
         />
       </div>
 
@@ -223,6 +225,7 @@ export function FoodLibraryPanel({
     (total, section) => total + section.foods.length,
     0,
   );
+  const isSingleSectionView = visibleSections.length === 1;
 
   const statusCounts = useMemo(
     () =>
@@ -386,7 +389,13 @@ export function FoodLibraryPanel({
         </div>
 
         {visibleSections.length > 0 ? (
-          <div className="grid gap-5 xl:grid-cols-2">
+          <div
+            className={`grid gap-5 ${
+              isSingleSectionView
+                ? "grid-cols-1"
+                : "xl:grid-cols-[repeat(auto-fit,minmax(22rem,1fr))]"
+            }`}
+          >
             {visibleSections.map((section) => (
               <article
                 key={section.category}
@@ -408,7 +417,11 @@ export function FoodLibraryPanel({
                   ) : null}
                 </div>
 
-                <ul className="mt-5 grid gap-3.5">
+                <ul
+                  className={`mt-5 grid gap-3.5 ${
+                    isSingleSectionView ? "xl:grid-cols-2" : ""
+                  }`}
+                >
                   {section.foods.map((food) => {
                     const status = statusByFoodId.get(food.id);
 
