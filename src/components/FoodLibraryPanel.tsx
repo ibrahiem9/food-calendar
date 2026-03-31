@@ -56,12 +56,16 @@ function FoodChip({
   statusLabel,
   statusSummary,
   firstIntroductionDate,
+  isSelected,
+  onInspect,
 }: {
   food: Food;
   statusKind: FoodLibraryStatusKind;
   statusLabel: string;
   statusSummary: string;
   firstIntroductionDate?: string;
+  isSelected: boolean;
+  onInspect: (foodId: string) => void;
 }) {
   const handleDragStart = (event: DragEvent<HTMLLIElement>) => {
     event.dataTransfer.effectAllowed = "copy";
@@ -72,7 +76,9 @@ function FoodChip({
     <li
       draggable
       onDragStart={handleDragStart}
-      className="flex cursor-grab flex-col gap-3 rounded-2xl bg-white/88 px-4 py-4 text-sm text-stone-700 shadow-[0_8px_32px_rgba(45,52,49,0.04)] active:cursor-grabbing"
+      className={`flex cursor-grab flex-col gap-3 rounded-2xl bg-white/88 px-4 py-4 text-sm text-stone-700 shadow-[0_8px_32px_rgba(45,52,49,0.04)] active:cursor-grabbing ${
+        isSelected ? "ring-2 ring-[#7ea279]/70" : ""
+      }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
@@ -98,17 +104,36 @@ function FoodChip({
 
       <div className="flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.18em] text-stone-500">
         <span>{CATEGORY_LABELS[food.category]}</span>
+        <button
+          type="button"
+          onClick={() => onInspect(food.id)}
+          className="rounded-full bg-[#eef2ed] px-3 py-1 font-semibold text-stone-600 transition hover:bg-[#e3e8e1]"
+        >
+          Inspect
+        </button>
+      </div>
+
+      <div className="flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.18em] text-stone-500">
         <span>
           {firstIntroductionDate
             ? format(parseISO(firstIntroductionDate), "MMM d")
-            : "Drag to day"}
+            : "No intro date"}
         </span>
+        <span>{isSelected ? "Selected" : "Draggable"}</span>
       </div>
     </li>
   );
 }
 
-export function FoodLibraryPanel({ days }: { days: DayEntry[] }) {
+export function FoodLibraryPanel({
+  days,
+  selectedFoodId,
+  onInspectFood,
+}: {
+  days: DayEntry[];
+  selectedFoodId: string;
+  onInspectFood: (foodId: string) => void;
+}) {
   const [activeFilter, setActiveFilter] = useState<FoodCategory | "all">("all");
   const [activeStatus, setActiveStatus] = useState<FoodLibraryStatusKind | "all">(
     "all",
@@ -339,6 +364,8 @@ export function FoodLibraryPanel({ days }: { days: DayEntry[] }) {
                         statusLabel={status.label}
                         statusSummary={status.summary}
                         firstIntroductionDate={status.firstIntroductionDate}
+                        isSelected={food.id === selectedFoodId}
+                        onInspect={onInspectFood}
                       />
                     );
                   })}

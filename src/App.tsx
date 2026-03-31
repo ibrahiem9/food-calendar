@@ -3,7 +3,9 @@ import { CalendarView } from "./components/CalendarView";
 import { CombinationPlannerPanel } from "./components/CombinationPlannerPanel";
 import { ConflictResolutionModal } from "./components/ConflictResolutionModal";
 import { FoodLibraryPanel } from "./components/FoodLibraryPanel";
+import { InspectorPanel } from "./components/InspectorPanel";
 import { ValidationPanel } from "./components/ValidationPanel";
+import { foods } from "./data/foods";
 import { recipes } from "./data/recipes";
 import { usePlannerStore } from "./store/plannerStore";
 
@@ -40,6 +42,8 @@ function App() {
   const clearAllDays = usePlannerStore((state) => state.clearAllDays);
   const savePlan = usePlannerStore((state) => state.savePlan);
   const [saveMessage, setSaveMessage] = useState("");
+  const [inspectedDayDate, setInspectedDayDate] = useState("");
+  const [inspectedFoodId, setInspectedFoodId] = useState(foods[0]?.id ?? "");
   const scheduledFirstIntroductions = days.reduce(
     (count, day) =>
       count + day.items.filter((item) => item.isFirstIntroduction).length,
@@ -66,6 +70,18 @@ function App() {
       initializeDays();
     }
   }, [days.length, initializeDays]);
+
+  useEffect(() => {
+    if (days.length > 0 && !days.some((day) => day.date === inspectedDayDate)) {
+      setInspectedDayDate(days[0].date);
+    }
+  }, [days, inspectedDayDate]);
+
+  useEffect(() => {
+    if (!foods.some((food) => food.id === inspectedFoodId)) {
+      setInspectedFoodId(foods[0]?.id ?? "");
+    }
+  }, [inspectedFoodId]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -318,14 +334,29 @@ function App() {
         ) : null}
 
         <ValidationPanel days={days} />
+        <InspectorPanel
+          days={days}
+          selectedDayDate={inspectedDayDate}
+          selectedFoodId={inspectedFoodId}
+          onSelectDay={setInspectedDayDate}
+          onSelectFood={setInspectedFoodId}
+        />
         <CombinationPlannerPanel days={days} onAddRecipe={addRecipeToDay} />
         <CalendarView
           days={days}
           onAddFood={handleAddFood}
           onMovePlannedItem={handleMovePlannedItem}
           onRemovePlannedItem={handleRemovePlannedItem}
+          selectedDayDate={inspectedDayDate}
+          selectedFoodId={inspectedFoodId}
+          onSelectDay={setInspectedDayDate}
+          onSelectFood={setInspectedFoodId}
         />
-        <FoodLibraryPanel days={days} />
+        <FoodLibraryPanel
+          days={days}
+          selectedFoodId={inspectedFoodId}
+          onInspectFood={setInspectedFoodId}
+        />
       </div>
       <ConflictResolutionModal
         conflict={pendingConflict}

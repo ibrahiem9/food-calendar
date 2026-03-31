@@ -160,6 +160,10 @@ function DayCell({
   onAddFood,
   onMovePlannedItem,
   onRemovePlannedItem,
+  selectedDayDate,
+  selectedFoodId,
+  onSelectDay,
+  onSelectFood,
 }: {
   day: DayEntry;
   days: DayEntry[];
@@ -170,9 +174,13 @@ function DayCell({
     targetDate: string,
   ) => void;
   onRemovePlannedItem: (date: string, itemIndex: number) => void;
+  selectedDayDate: string;
+  selectedFoodId: string;
+  onSelectDay: (date: string) => void;
+  onSelectFood: (foodId: string) => void;
 }) {
   const parsedDate = parseISO(day.date);
-  const [selectedFoodId, setSelectedFoodId] = useState("");
+  const [selectedFoodToAddId, setSelectedFoodToAddId] = useState("");
   const [selectedCategory, setSelectedCategory] =
     useState<FoodCategory>("fruit");
   const [activeMoveIndex, setActiveMoveIndex] = useState<number | null>(null);
@@ -190,7 +198,7 @@ function DayCell({
     const firstFood = availableFoods[0];
 
     if (firstFood) {
-      setSelectedFoodId((currentFoodId) => {
+      setSelectedFoodToAddId((currentFoodId) => {
         const hasMatch = availableFoods.some((food) => food.id === currentFoodId);
         return hasMatch ? currentFoodId : firstFood.id;
       });
@@ -198,11 +206,11 @@ function DayCell({
   }, [availableFoods]);
 
   const handleAddFood = () => {
-    if (!selectedFoodId) {
+    if (!selectedFoodToAddId) {
       return;
     }
 
-    onAddFood(day.date, selectedFoodId);
+    onAddFood(day.date, selectedFoodToAddId);
   };
 
   const handleStartMove = (itemIndex: number) => {
@@ -251,12 +259,13 @@ function DayCell({
 
   return (
     <li
+      onClick={() => onSelectDay(day.date)}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={`rounded-[1.5rem] bg-white/88 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)] transition ${
         isDropTarget ? "bg-[#eef5ea] ring-2 ring-[#9eb894]/60" : ""
-      }`}
+      } ${selectedDayDate === day.date ? "ring-2 ring-[#7ea279]/70" : ""}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -304,6 +313,10 @@ function DayCell({
             {day.items.map((item, index) => {
               const foodCategory = FOOD_CATEGORY_BY_ID[item.foodId] ?? "fruit";
               const isCombination = item.type === "combination";
+              const inspectFoodId =
+                item.type === "combination"
+                  ? item.ingredientFoodIds?.[0] ?? ""
+                  : item.foodId;
 
               return (
                 <li
@@ -344,19 +357,45 @@ function DayCell({
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleStartMove(index)}
-                      className="rounded-full bg-[#ecefe9] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-700 transition hover:bg-[#e3e7e1]"
-                    >
-                      Move
-                    </button>
+                    <div className="flex flex-col gap-2">
+                      <button
+                        type="button"
+                        disabled={!inspectFoodId}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onSelectDay(day.date);
+                          if (inspectFoodId) {
+                            onSelectFood(inspectFoodId);
+                          }
+                        }}
+                        className={`rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition ${
+                          selectedFoodId === inspectFoodId
+                            ? "bg-[#deebfb] text-sky-900"
+                            : "bg-[#ecefe9] text-stone-700 hover:bg-[#e3e7e1] disabled:cursor-not-allowed disabled:bg-[#e7ebe7] disabled:text-stone-400"
+                        }`}
+                      >
+                        {isCombination ? "Inspect Food" : "Inspect"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleStartMove(index);
+                        }}
+                        className="rounded-full bg-[#ecefe9] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-700 transition hover:bg-[#e3e7e1]"
+                      >
+                        Move
+                      </button>
+                    </div>
                   </div>
 
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       type="button"
-                      onClick={() => onRemovePlannedItem(day.date, index)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onRemovePlannedItem(day.date, index);
+                      }}
                       className="rounded-full bg-[#f5ddd4] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-800 transition hover:bg-[#efcdbf]"
                     >
                       Remove
@@ -373,14 +412,20 @@ function DayCell({
                         />
                         <button
                           type="button"
-                          onClick={handleMoveItem}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleMoveItem();
+                          }}
                           className="rounded-full bg-[linear-gradient(135deg,_#7ea279,_#b9cfa8)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-900 shadow-[0_8px_32px_rgba(45,52,49,0.06)] transition hover:brightness-[1.02]"
                         >
                           Apply Move
                         </button>
                         <button
                           type="button"
-                          onClick={() => setActiveMoveIndex(null)}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setActiveMoveIndex(null);
+                          }}
                           className="rounded-full bg-[#ecefe9] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-700 transition hover:bg-[#e3e7e1]"
                         >
                           Cancel
@@ -429,8 +474,11 @@ function DayCell({
               Food
             </span>
             <select
-              value={selectedFoodId}
-              onChange={(event) => setSelectedFoodId(event.target.value)}
+              value={selectedFoodToAddId}
+              onChange={(event) => {
+                setSelectedFoodToAddId(event.target.value);
+                onSelectFood(event.target.value);
+              }}
               className="w-full rounded-[1rem] bg-white px-3 py-3 text-sm text-stone-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] outline-none"
             >
               {availableFoods.map((food) => (
@@ -527,6 +575,10 @@ export function CalendarView({
   onAddFood,
   onMovePlannedItem,
   onRemovePlannedItem,
+  selectedDayDate,
+  selectedFoodId,
+  onSelectDay,
+  onSelectFood,
 }: {
   days: DayEntry[];
   onAddFood: (date: string, foodId: string) => void;
@@ -536,6 +588,10 @@ export function CalendarView({
     targetDate: string,
   ) => void;
   onRemovePlannedItem: (date: string, itemIndex: number) => void;
+  selectedDayDate: string;
+  selectedFoodId: string;
+  onSelectDay: (date: string) => void;
+  onSelectFood: (foodId: string) => void;
 }) {
   const months = useMemo(() => groupDaysByMonth(days), [days]);
   const [activeMonthId, setActiveMonthId] = useState(months[0]?.id ?? "");
@@ -692,6 +748,10 @@ export function CalendarView({
                     onAddFood={onAddFood}
                     onMovePlannedItem={onMovePlannedItem}
                     onRemovePlannedItem={onRemovePlannedItem}
+                    selectedDayDate={selectedDayDate}
+                    selectedFoodId={selectedFoodId}
+                    onSelectDay={onSelectDay}
+                    onSelectFood={onSelectFood}
                   />
                 ))}
               </ul>

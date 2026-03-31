@@ -90,10 +90,11 @@ Use this file to track your progress through the 18 phases.
   - Drag from library to calendar
   - Verification completed on 2026-03-31: `npm run build`
   
-- [ ] **Phase 12:** Inspector & Explanation Panel
+- [x] **Phase 12:** Inspector & Explanation Panel
   - Day details show on click
   - Explanations are helpful and clear
   - "Why?" buttons work
+  - Verification completed on 2026-03-31: `npm run build`
   
 - [ ] **Phase 13:** CSV Export
   - Export button downloads CSV
@@ -224,6 +225,11 @@ Track any problems or decisions here:
 **Issue:** Manual edits still wrote directly into planner state, so invalid moves or removals only surfaced after the fact and there was no recovery path for overrides.  
 **Resolution:** Added conflict-aware manual edit requests with suggested alternative dates, an override modal plus warning banner, move controls in the calendar, undo/redo history with keyboard shortcuts, and verified the result with `npm run build`.
 
+### Date: 2026-03-31
+**Phase:** 12  
+**Issue:** The app exposed validation and planning status, but there was no focused way to explain why a specific day was populated a certain way or why a selected food was blocked on a given date.  
+**Resolution:** Added a dedicated inspector panel, wired click-based day and food selection into the calendar and food library, surfaced per-item rule explanations plus selected-food blocked/allowed reasoning, and verified the result with `npm run build`.
+
 ---
 
 ## Time Tracking (Optional)
@@ -241,9 +247,8 @@ Track any problems or decisions here:
 | 8 | 1 hour | 1 hour | Curated recipe catalog, types, and build verification |
 | 9 | 2-3 hours | 2 hours | Combination eligibility utility, planner UI, store actions, and build verification |
 | 10 | 2-3 hours | 2 hours | Conflict-aware manual edit flow, override modal, warning banner, move controls, undo/redo, and build verification |
-| 10 | 2-3 hours | | |
 | 11 | 2 hours | | |
-| 12 | 2 hours | | |
+| 12 | 2 hours | 2 hours | Inspector panel, selection wiring, explanation logic, and build verification |
 | 13 | 1 hour | | |
 | 14 | 1-2 hours | | |
 | 15 | 1-2 hours | | |
@@ -256,7 +261,7 @@ Track any problems or decisions here:
 
 ## Current Focus
 
-**Currently working on Phase:** 10
-**Next up:** Add manual editing conflict resolution, richer edit controls, and undo/redo support.
+**Currently working on Phase:** 13
+**Next up:** Add CSV export with planner fields and downloadable formatting.
 
 **Blocked by:** None
