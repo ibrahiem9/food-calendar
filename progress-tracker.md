@@ -39,26 +39,29 @@ Use this file to track your progress through the 18 phases.
   - Clear all functionality works
   - Verification completed on 2026-03-30: `npm run build`
   
-- [ ] **Phase 4:** Rule Engine - Validation
+- [x] **Phase 4:** Rule Engine - Validation
   - All 7 validators implemented
   - Validation panel shows errors
   - Visual indicators on days (✓/⚠/✗)
+  - Verification completed on 2026-03-30: `npm run build`
   
-- [ ] **Phase 5:** Auto-Generate First Introductions
+- [x] **Phase 5:** Auto-Generate First Introductions
   - Generate button works
   - All foods get scheduled
   - No spacing rule violations
   - NEW badges display correctly
   
-- [ ] **Phase 6:** Fill Empty Days & Repetition
+- [x] **Phase 6:** Fill Empty Days & Repetition
   - Every day has at least one food
   - REPEAT badges display correctly
   - Distinction between new and repeat clear
+  - Verification completed on 2026-03-30: `npm run build`
   
-- [ ] **Phase 7:** Allergen Weekly Repetition
+- [x] **Phase 7:** Allergen Weekly Repetition
   - Each allergen appears 1-2x per week after first intro
   - Weekly tracking working
   - No validation errors for allergen cadence
+  - Verification completed on 2026-03-30: `npm run build` and direct generation check with zero validation errors
 
 ### Advanced Features (Phases 8-10)
 - [ ] **Phase 8:** Combination Foods - Data Model
@@ -133,14 +136,14 @@ After completing core phases, verify:
 - [ ] Categories display properly
 
 ### After Phase 4
-- [ ] Validators catch all rule violations
-- [ ] Error messages are clear
-- [ ] Validation runs automatically
+- [x] Validators catch all rule violations
+- [x] Error messages are clear
+- [x] Validation runs automatically
 
 ### After Phase 7
-- [ ] Calendar generation produces no errors
-- [ ] All foods introduced at least once
-- [ ] All rules passing (green checkmarks)
+- [x] Calendar generation produces no errors
+- [x] All foods introduced at least once
+- [x] All rules passing (green checkmarks)
 - [ ] Can export and review full calendar
 
 ### After Phase 10
@@ -192,6 +195,26 @@ Track any problems or decisions here:
 **Issue:** Phase 2 had only the month-grouped calendar shell, so there was no manual editing workflow or persistence yet.  
 **Resolution:** Added inline day-level food assignment and removal, automatic localStorage persistence plus manual save/reset controls, and verified the updated app with `npm run build`.
 
+### Date: 2026-03-30
+**Phase:** 4  
+**Issue:** The planner had no rule engine yet, so manual changes could create invalid schedules with no visibility into why they were invalid.  
+**Resolution:** Added standalone validator modules, automatic validation on every store update, day-level valid/warning/invalid indicators, a central validation panel, and verified the Phase 4 implementation with `npm run build`.
+
+### Date: 2026-03-30
+**Phase:** 5  
+**Issue:** The food catalog contains 94 foods, which cannot fit into 176 calendar days if first introductions are limited to exactly one food every other day.  
+**Resolution:** Added a deterministic first-introduction planner that batches up to two new foods on eligible intro days, spaces allergen introductions at least 4 calendar days apart to satisfy the current validator, wires generation into Zustand, and updates the UI to expose the generated coverage.
+
+### Date: 2026-03-30
+**Phase:** 6  
+**Issue:** The Phase 5 generator only placed first introductions, leaving many dates empty and causing expected daily-minimum validation failures after generation.  
+**Resolution:** Added a repeat-fill pass that backfills each empty day with 1-2 previously introduced foods, wired it into the generation flow, updated the UI copy and badges for NEW vs REPEAT, and verified with `npm run build`.
+
+### Date: 2026-03-30
+**Phase:** 7  
+**Issue:** The Phase 6 generator could fill empty days, but weekly allergen maintenance still needed deterministic scheduling and visible cadence status to keep the generated plan fully compliant.  
+**Resolution:** Reworked first-introduction pacing to reserve room for allergen follow-up, added a weekly allergen repetition pass plus cadence summaries in the calendar UI, and verified with `npm run build` and a direct planner generation check showing 94 foods scheduled across all 176 days with zero validation errors.
+
 ### Date: ___________
 **Phase:** ___________  
 **Issue:** ___________________________________________  
@@ -207,10 +230,10 @@ Track any problems or decisions here:
 | 1 | 1 hour | 1 hour | Typed food catalog, grouped library UI, and build verification |
 | 2 | 1 hour | 1 hour | Calendar types, Zustand store, month-grouped timeline UI, and verification; inclusive range is 176 days |
 | 3 | 2 hours | 1.5 hours | Manual placement UI, localStorage persistence, clear/save controls, and build verification |
-| 4 | 2-3 hours | | |
-| 5 | 3-4 hours | | |
-| 6 | 1-2 hours | | |
-| 7 | 3-4 hours | | |
+| 4 | 2-3 hours | 2 hours | Validator modules, store integration, validation UI, and build verification |
+| 5 | 3-4 hours | 2 hours | Deterministic first-introduction planner, generation UI, tracker update, and verification |
+| 6 | 1-2 hours | 1 hour | Deterministic repeat-fill pass, UI/status copy refresh, tracker update, and build verification |
+| 7 | 3-4 hours | 2 hours | Weekly allergen repetition pass, cadence UI, tracker update, and zero-error generation verification |
 | 8 | 1 hour | | |
 | 9 | 2-3 hours | | |
 | 10 | 2-3 hours | | |
@@ -228,8 +251,7 @@ Track any problems or decisions here:
 
 ## Current Focus
 
-**Currently working on Phase:** 2
+**Currently working on Phase:** 8
+**Next up:** Define the recipe data model and add curated combination-food recipes with restriction flags.
 
-**Next up:** Generate the 175-day date range, define calendar types, set up the Zustand planner store, and render the first calendar view
-
-**Blocked by:** Environment-specific esbuild runtime crash during Vite build/dev verification
+**Blocked by:** None

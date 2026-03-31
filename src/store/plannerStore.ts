@@ -6,6 +6,12 @@ import {
   createEmptyValidationResult,
   generateInitialDayEntries,
 } from "../utils/dateUtils";
+import {
+  fillEmptyDays,
+  planFirstIntroductions,
+  scheduleAllergenRepetitions,
+} from "../utils/plannerEngine";
+import { runAllValidations } from "../validators";
 
 const STORAGE_KEY = "babybite-calendar-plan";
 
@@ -45,6 +51,9 @@ const markFirstIntroductions = (days: DayEntry[]): DayEntry[] => {
   }));
 };
 
+const prepareDays = (days: DayEntry[]): DayEntry[] =>
+  runAllValidations(markFirstIntroductions(days));
+
 const loadStoredDays = (): DayEntry[] | null => {
   if (typeof window === "undefined") {
     return null;
@@ -63,7 +72,7 @@ const loadStoredDays = (): DayEntry[] | null => {
       return null;
     }
 
-    return markFirstIntroductions(parsed.days.map(normalizeDayEntry));
+    return prepareDays(parsed.days.map(normalizeDayEntry));
   } catch {
     return null;
   }
@@ -75,6 +84,11 @@ interface PlannerStoreState {
   initializeDays: () => void;
   addFoodToDay: (date: string, foodId: string) => void;
   removeFoodFromDay: (date: string, foodId: string) => void;
+  generateFirstIntroductions: () => {
+    scheduledCount: number;
+    populatedDayCount: number;
+    unscheduledFoodIds: string[];
+  };
   clearAllDays: () => void;
   savePlan: () => void;
 }
@@ -85,7 +99,7 @@ export const usePlannerStore = create<PlannerStoreState>((set) => ({
   initializeDays: () => {
     set(() => {
       const storedDays = loadStoredDays();
-      const nextDays = storedDays ?? generateInitialDayEntries();
+      const nextDays = storedDays ?? prepareDays(generateInitialDayEntries());
 
       if (!storedDays) {
         persistDays(nextDays);
@@ -113,7 +127,7 @@ export const usePlannerStore = create<PlannerStoreState>((set) => ({
         return state;
       }
 
-      const nextDays = markFirstIntroductions(
+      const nextDays = prepareDays(
         state.days.map((day) =>
           day.date === date
             ? {
@@ -139,7 +153,7 @@ export const usePlannerStore = create<PlannerStoreState>((set) => ({
   },
   removeFoodFromDay: (date, foodId) => {
     set((state) => {
-      const nextDays = markFirstIntroductions(
+      const nextDays = prepareDays(
         state.days.map((day) => {
           if (day.date !== date) {
             return day;
@@ -163,9 +177,48 @@ export const usePlannerStore = create<PlannerStoreState>((set) => ({
       return { days: nextDays };
     });
   },
+  generateFirstIntroductions: () => {
+    let summary = {
+      scheduledCount: 0,
+      populatedDayCount: 0,
+      unscheduledFoodIds: [] as string[],
+    };
+
+    set((state) => {
+      const baseDays =
+        state.days.length > 0 ? state.days : generateInitialDayEntries();
+      const daysForGeneration = baseDays.map((day) => ({
+        ...day,
+        items: [],
+        validation: createEmptyValidationResult(),
+      }));
+      const generationResult = planFirstIntroductions(
+        daysForGeneration,
+        state.foods,
+      );
+      const nextDays = prepareDays(
+        scheduleAllergenRepetitions(
+          fillEmptyDays(generationResult.days, state.foods),
+          state.foods,
+        ),
+      );
+
+      persistDays(nextDays);
+      summary = {
+        scheduledCount:
+          state.foods.length - generationResult.unscheduledFoodIds.length,
+        populatedDayCount: nextDays.filter((day) => day.items.length > 0).length,
+        unscheduledFoodIds: generationResult.unscheduledFoodIds,
+      };
+
+      return { days: nextDays };
+    });
+
+    return summary;
+  },
   clearAllDays: () => {
     set(() => {
-      const nextDays = generateInitialDayEntries();
+      const nextDays = prepareDays(generateInitialDayEntries());
       persistDays(nextDays);
 
       return {

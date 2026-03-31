@@ -1,4 +1,11 @@
-import { format, parseISO } from "date-fns";
+import {
+  endOfWeek,
+  format,
+  isAfter,
+  isBefore,
+  parseISO,
+  startOfWeek,
+} from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { foods, foodsByCategory } from "../data/foods";
 import type { DayEntry } from "../types/calendar";
@@ -57,13 +64,104 @@ const CATEGORY_ACCENTS: Record<FoodCategory, string> = {
 const FOOD_CATEGORY_BY_ID = Object.fromEntries(
   foods.map((food) => [food.id, food.category]),
 ) as Record<string, FoodCategory>;
+const FOOD_NAME_BY_ID = Object.fromEntries(
+  foods.map((food) => [food.id, food.name]),
+) as Record<string, string>;
+const ALLERGEN_IDS = foods
+  .filter((food) => food.isAllergen)
+  .map((food) => food.id);
+
+const getWeekIndicesForDate = (days: DayEntry[], date: string) => {
+  const weekStart = startOfWeek(parseISO(date), { weekStartsOn: 0 });
+  const weekEnd = endOfWeek(parseISO(date), { weekStartsOn: 0 });
+
+  return days.flatMap((entry, index) => {
+    const dayDate = parseISO(entry.date);
+
+    if (isBefore(dayDate, weekStart) || isAfter(dayDate, weekEnd)) {
+      return [];
+    }
+
+    return [index];
+  });
+};
+
+const getWeeklyAllergenStatus = (days: DayEntry[], date: string) => {
+  const weekIndices = getWeekIndicesForDate(days, date);
+  const due: string[] = [];
+  const overLimit: string[] = [];
+  let satisfiedCount = 0;
+
+  for (const allergenId of ALLERGEN_IDS) {
+    const firstIntroDay = days.find((day) =>
+      day.items.some(
+        (item) => item.foodId === allergenId && item.isFirstIntroduction,
+      ),
+    );
+
+    if (!firstIntroDay || isAfter(parseISO(firstIntroDay.date), parseISO(date))) {
+      continue;
+    }
+
+    const appearances = weekIndices.reduce(
+      (count, index) =>
+        count +
+        (days[index].items.some((item) => item.foodId === allergenId) ? 1 : 0),
+      0,
+    );
+
+    if (appearances === 0) {
+      due.push(FOOD_NAME_BY_ID[allergenId] ?? allergenId);
+      continue;
+    }
+
+    if (appearances > 2) {
+      overLimit.push(FOOD_NAME_BY_ID[allergenId] ?? allergenId);
+      continue;
+    }
+
+    satisfiedCount += 1;
+  }
+
+  return {
+    due,
+    overLimit,
+    satisfiedCount,
+  };
+};
+
+const getValidationStatus = (day: DayEntry) => {
+  if (day.validation.errors.length > 0) {
+    return {
+      icon: "✗",
+      label: "Invalid",
+      className: "bg-[#f7d8cc] text-stone-900",
+    };
+  }
+
+  if (day.validation.warnings.length > 0) {
+    return {
+      icon: "⚠",
+      label: "Warning",
+      className: "bg-[#efe4d2] text-stone-900",
+    };
+  }
+
+  return {
+    icon: "✓",
+    label: "Valid",
+    className: "bg-[#dfead9] text-stone-800",
+  };
+};
 
 function DayCell({
   day,
+  days,
   onAddFood,
   onRemoveFood,
 }: {
   day: DayEntry;
+  days: DayEntry[];
   onAddFood: (date: string, foodId: string) => void;
   onRemoveFood: (date: string, foodId: string) => void;
 }) {
@@ -73,6 +171,11 @@ function DayCell({
     useState<FoodCategory>("fruit");
 
   const availableFoods = foodsByCategory[selectedCategory];
+  const validationStatus = getValidationStatus(day);
+  const weeklyAllergenStatus = useMemo(
+    () => getWeeklyAllergenStatus(days, day.date),
+    [day.date, days],
+  );
 
   useEffect(() => {
     const firstFood = availableFoods[0];
@@ -108,9 +211,16 @@ function DayCell({
           </p>
         </div>
 
-        <span className="rounded-full bg-[#edf2ec] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-          {day.items.length} item{day.items.length === 1 ? "" : "s"}
-        </span>
+        <div className="flex flex-col items-end gap-2">
+          <span className="rounded-full bg-[#edf2ec] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+            {day.items.length} item{day.items.length === 1 ? "" : "s"}
+          </span>
+          <span
+            className={`rounded-sm px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${validationStatus.className}`}
+          >
+            {validationStatus.icon} {validationStatus.label}
+          </span>
+        </div>
       </div>
 
       <div className="mt-4 rounded-[1.25rem] bg-[#eef2ed] p-3">
@@ -153,7 +263,7 @@ function DayCell({
                               : "bg-[#ecefea] text-stone-600"
                           }`}
                         >
-                          {item.isFirstIntroduction ? "New" : "Repeat"}
+                          {item.isFirstIntroduction ? "NEW" : "REPEAT"}
                         </span>
                       </div>
                     </div>
@@ -228,6 +338,74 @@ function DayCell({
           </button>
         </div>
       </div>
+
+      <div className="mt-4 rounded-[1.25rem] bg-[#f6f2ef] p-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+            Validation
+          </p>
+          <span
+            className={`rounded-sm px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${validationStatus.className}`}
+          >
+            {validationStatus.label}
+          </span>
+        </div>
+
+        {day.validation.errors.length === 0 && day.validation.warnings.length === 0 ? (
+          <p className="mt-3 font-sans text-sm text-stone-600">
+            All current validation checks pass for this day.
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {day.validation.errors.map((error, index) => (
+              <li
+                key={`error-${index}`}
+                className="rounded-[1rem] bg-[#f8e1d8] px-3 py-3 font-sans text-sm leading-6 text-stone-800"
+              >
+                {error}
+              </li>
+            ))}
+            {day.validation.warnings.map((warning, index) => (
+              <li
+                key={`warning-${index}`}
+                className="rounded-[1rem] bg-[#efe4d2] px-3 py-3 font-sans text-sm leading-6 text-stone-800"
+              >
+                {warning}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="mt-4 rounded-[1.25rem] bg-[#edf3ee] p-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+            Allergen Week
+          </p>
+          <span className="rounded-sm bg-white/80 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-600">
+            Sun-Sat
+          </span>
+        </div>
+
+        {weeklyAllergenStatus.overLimit.length > 0 ? (
+          <p className="mt-3 rounded-[1rem] bg-[#f8e1d8] px-3 py-3 font-sans text-sm leading-6 text-stone-800">
+            Over weekly limit: {weeklyAllergenStatus.overLimit.join(", ")}
+          </p>
+        ) : weeklyAllergenStatus.due.length > 0 ? (
+          <p className="mt-3 rounded-[1rem] bg-[#efe4d2] px-3 py-3 font-sans text-sm leading-6 text-stone-800">
+            Allergen due this week: {weeklyAllergenStatus.due.join(", ")}
+          </p>
+        ) : weeklyAllergenStatus.satisfiedCount > 0 ? (
+          <p className="mt-3 rounded-[1rem] bg-[#dfead9] px-3 py-3 font-sans text-sm leading-6 text-stone-800">
+            Allergen cadence satisfied for {weeklyAllergenStatus.satisfiedCount} active allergen
+            {weeklyAllergenStatus.satisfiedCount === 1 ? "" : "s"} this week.
+          </p>
+        ) : (
+          <p className="mt-3 font-sans text-sm text-stone-600">
+            No active allergen tracking for this week yet.
+          </p>
+        )}
+      </div>
     </li>
   );
 }
@@ -243,6 +421,47 @@ export function CalendarView({
 }) {
   const months = useMemo(() => groupDaysByMonth(days), [days]);
   const [activeMonthId, setActiveMonthId] = useState(months[0]?.id ?? "");
+  const firstIntroductionCount = days.reduce(
+    (count, day) =>
+      count + day.items.filter((item) => item.isFirstIntroduction).length,
+    0,
+  );
+  const repeatCount = days.reduce(
+    (count, day) =>
+      count + day.items.filter((item) => !item.isFirstIntroduction).length,
+    0,
+  );
+  const firstIntroductionDays = days.filter((day) =>
+    day.items.some((item) => item.isFirstIntroduction),
+  ).length;
+  const populatedDays = days.filter((day) => day.items.length > 0).length;
+  const allergenWeekSummary = useMemo(() => {
+    const processedWeeks = new Set<string>();
+    let dueWeeks = 0;
+    let overLimitWeeks = 0;
+    let satisfiedWeeks = 0;
+
+    for (const day of days) {
+      const weekKey = format(startOfWeek(parseISO(day.date), { weekStartsOn: 0 }), "yyyy-MM-dd");
+
+      if (processedWeeks.has(weekKey)) {
+        continue;
+      }
+
+      processedWeeks.add(weekKey);
+      const status = getWeeklyAllergenStatus(days, day.date);
+
+      if (status.overLimit.length > 0) {
+        overLimitWeeks += 1;
+      } else if (status.due.length > 0) {
+        dueWeeks += 1;
+      } else if (status.satisfiedCount > 0) {
+        satisfiedWeeks += 1;
+      }
+    }
+
+    return { dueWeeks, overLimitWeeks, satisfiedWeeks };
+  }, [days]);
 
   useEffect(() => {
     if (!activeMonthId && months[0]) {
@@ -268,13 +487,12 @@ export function CalendarView({
             </p>
             <div className="space-y-2">
               <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Phase 3 manual planning across all 176 calendar days
+                Phase 6 calendar coverage across all {days.length} calendar days
               </h2>
               <p className="font-sans text-sm leading-7 text-stone-700">
-                Each day now supports direct food assignment with inline add and
-                remove controls. Placements persist in localStorage so the
-                calendar survives page refreshes while the rule engine is still
-                pending.
+                Generated first introductions now share the same calendar as
+                manual edits, and empty dates are backfilled with repeat foods
+                that were introduced earlier in the timeline.
               </p>
             </div>
           </div>
@@ -294,13 +512,26 @@ export function CalendarView({
 
             <div className="rounded-[1.5rem] bg-white/80 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                Assigned Foods
+                Populated Days
               </p>
               <p className="mt-2 font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                {days.reduce((total, day) => total + day.items.length, 0)}
+                {populatedDays}
               </p>
               <p className="mt-1 font-sans text-sm text-stone-600">
-                Across {months.length} month groups from March to September 2026.
+                {firstIntroductionCount} new foods and {repeatCount} repeats across{" "}
+                {firstIntroductionDays} intro days in {months.length} month groups.
+              </p>
+            </div>
+
+            <div className="rounded-[1.5rem] bg-white/80 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
+                Allergen Weeks
+              </p>
+              <p className="mt-2 font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
+                {allergenWeekSummary.satisfiedWeeks}
+              </p>
+              <p className="mt-1 font-sans text-sm text-stone-600">
+                {allergenWeekSummary.dueWeeks} due weeks and {allergenWeekSummary.overLimitWeeks} over-limit weeks in the current plan.
               </p>
             </div>
           </div>
@@ -338,6 +569,7 @@ export function CalendarView({
                   <DayCell
                     key={day.date}
                     day={day}
+                    days={days}
                     onAddFood={onAddFood}
                     onRemoveFood={onRemoveFood}
                   />
