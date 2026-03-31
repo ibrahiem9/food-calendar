@@ -1,4 +1,4 @@
-export type AppView = "calendar" | "library" | "rules" | "recipes";
+export type AppView = "calendar" | "library" | "rules" | "recipes" | "guide";
 
 export interface FoodVisual {
   imagePath: string;

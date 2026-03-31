@@ -5,6 +5,7 @@ import { CalendarScreen } from "./components/screens/CalendarScreen";
 import { LibraryScreen } from "./components/screens/LibraryScreen";
 import { RecipesScreen } from "./components/screens/RecipesScreen";
 import { RulesScreen } from "./components/screens/RulesScreen";
+import { GuideScreen } from "./components/screens/GuideScreen";
 import { MobileNavDrawer } from "./components/shell/MobileNavDrawer";
 import { SidebarNav } from "./components/shell/SidebarNav";
 import { TopBar } from "./components/shell/TopBar";
@@ -43,6 +44,12 @@ const NAV_ITEMS: Array<{
     label: "Recipes",
     description: "Combination planner with unlock checks",
     icon: "✦",
+  },
+  {
+    id: "guide",
+    label: "Guide",
+    description: "Quick tutorial and workflow reference",
+    icon: "?",
   },
 ];
 
@@ -329,6 +336,10 @@ function App() {
 
     if (activeView === "recipes") {
       return <RecipesScreen days={days} onAddRecipe={addRecipeToDay} />;
+    }
+
+    if (activeView === "guide") {
+      return <GuideScreen />;
     }
 
     return (
