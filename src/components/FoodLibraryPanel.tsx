@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns";
 import { useMemo, useState, type DragEvent } from "react";
 import { foodsByCategory } from "../data/foods";
+import { getCategoryVisual, getFoodVisual } from "../data/foodVisuals";
 import { FOOD_CATEGORIES, type Food, type FoodCategory } from "../types/food";
 import {
   getFoodLibraryStatuses,
@@ -17,11 +18,11 @@ const CATEGORY_LABELS: Record<FoodCategory, string> = {
 };
 
 const CATEGORY_TONES: Record<FoodCategory, string> = {
-  fruit: "bg-[#eef4ea]",
-  vegetable: "bg-[#edf1ec]",
-  starch: "bg-[#f4efe7]",
-  protein: "bg-[#ecefe8]",
-  allergen: "bg-[#fde7df]",
+  fruit: "bg-[#f5f0e6]",
+  vegetable: "bg-[#edf3e8]",
+  starch: "bg-[#f6efe3]",
+  protein: "bg-[#eef1ec]",
+  allergen: "bg-[#fbefe9]",
 };
 
 const STATUS_TONES: Record<FoodLibraryStatusKind, string> = {
@@ -50,6 +51,39 @@ const STATUS_OPTIONS: Array<{ label: string; value: FoodLibraryStatusKind | "all
   { label: "Satisfied", value: "satisfied" },
 ];
 
+function FeaturedCategoryCard({
+  category,
+  onFocus,
+}: {
+  category: FoodCategory;
+  onFocus: (category: FoodCategory) => void;
+}) {
+  const visual = getCategoryVisual(category);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onFocus(category)}
+      className={`overflow-hidden rounded-[1.6rem] bg-gradient-to-br ${visual.accentClassName} p-4 text-left shadow-[0_8px_32px_rgba(45,52,49,0.06)] transition hover:translate-y-[-1px]`}
+    >
+      <img
+        src={visual.imagePath}
+        alt={visual.alt}
+        className="h-36 w-full rounded-[1.2rem] object-cover"
+      />
+      <p className="mt-4 font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+        {CATEGORY_LABELS[category]}
+      </p>
+      <h3 className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
+        Explore {CATEGORY_LABELS[category].toLowerCase()}
+      </h3>
+      <p className="mt-2 font-sans text-sm leading-6 text-stone-700">
+        Jump to a visual slice of the library and drag any item into the selected calendar day.
+      </p>
+    </button>
+  );
+}
+
 function FoodChip({
   food,
   statusKind,
@@ -67,6 +101,8 @@ function FoodChip({
   isSelected: boolean;
   onInspect: (foodId: string) => void;
 }) {
+  const visual = getFoodVisual(food.id);
+
   const handleDragStart = (event: DragEvent<HTMLLIElement>) => {
     event.dataTransfer.effectAllowed = "copy";
     event.dataTransfer.setData("text/plain", food.id);
@@ -76,50 +112,60 @@ function FoodChip({
     <li
       draggable
       onDragStart={handleDragStart}
-      className={`flex cursor-grab flex-col gap-3 rounded-2xl bg-white/88 px-4 py-4 text-sm text-stone-700 shadow-[0_8px_32px_rgba(45,52,49,0.04)] active:cursor-grabbing ${
+      className={`flex cursor-grab gap-3 rounded-[1.35rem] bg-white/88 p-3 text-sm text-stone-700 shadow-[0_8px_32px_rgba(45,52,49,0.04)] active:cursor-grabbing ${
         isSelected ? "ring-2 ring-[#7ea279]/70" : ""
       }`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          <p className="font-medium text-stone-900">{food.name}</p>
-          <p className="font-sans text-xs leading-5 text-stone-500">
-            {statusSummary}
-          </p>
-        </div>
-
-        <div className="flex flex-col items-end gap-2">
-          <span
-            className={`rounded-sm px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${STATUS_TONES[statusKind]}`}
-          >
-            {statusLabel}
-          </span>
-          {food.isAllergen ? (
-            <span className="rounded-sm bg-[#f3b5a8] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-900">
-              Allergen
-            </span>
-          ) : null}
-        </div>
+      <div
+        className={`h-20 w-20 shrink-0 rounded-[1rem] bg-gradient-to-br ${visual.accentClassName} p-2`}
+      >
+        <img
+          src={visual.imagePath}
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full rounded-[0.8rem] object-cover"
+        />
       </div>
 
-      <div className="flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.18em] text-stone-500">
-        <span>{CATEGORY_LABELS[food.category]}</span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="font-medium text-stone-900">{food.name}</p>
+            <p className="mt-1 font-sans text-xs leading-5 text-stone-500">
+              {statusSummary}
+            </p>
+          </div>
+
+          <div className="flex flex-col items-end gap-2">
+            <span
+              className={`rounded-sm px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${STATUS_TONES[statusKind]}`}
+            >
+              {statusLabel}
+            </span>
+            {food.isAllergen ? (
+              <span className="rounded-sm bg-[#f3b5a8] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-900">
+                Allergen
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.18em] text-stone-500">
+          <span>{CATEGORY_LABELS[food.category]}</span>
+          <span>
+            {firstIntroductionDate
+              ? format(parseISO(firstIntroductionDate), "MMM d")
+              : "No intro date"}
+          </span>
+        </div>
+
         <button
           type="button"
           onClick={() => onInspect(food.id)}
-          className="rounded-full bg-[#eef2ed] px-3 py-1 font-semibold text-stone-600 transition hover:bg-[#e3e8e1]"
+          className="mt-3 rounded-full bg-[#eef2ed] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-700 transition hover:bg-[#e3e8e1]"
         >
-          Inspect
+          {isSelected ? "Selected" : "Inspect"}
         </button>
-      </div>
-
-      <div className="flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.18em] text-stone-500">
-        <span>
-          {firstIntroductionDate
-            ? format(parseISO(firstIntroductionDate), "MMM d")
-            : "No intro date"}
-        </span>
-        <span>{isSelected ? "Selected" : "Draggable"}</span>
       </div>
     </li>
   );
@@ -198,57 +244,59 @@ export function FoodLibraryPanel({
   );
 
   return (
-    <section className="rounded-[2rem] bg-[#f1f4f1] p-6 sm:p-7">
+    <section className="rounded-[2rem] bg-[#f1f4f1] p-5 sm:p-6">
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl space-y-3">
-            <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-              Food Library
-            </p>
-            <div className="space-y-2">
-              <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Food library with live status and drag-to-calendar
-              </h2>
-              <p className="font-sans text-sm leading-7 text-stone-700">
-                Search the catalog, narrow by category or status, and drag any
-                food onto a calendar day. Allergen cards reflect the active
-                Sunday-Saturday week so due repeats stay visible while you edit.
-              </p>
-            </div>
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {FOOD_CATEGORIES.map((category) => (
+              <FeaturedCategoryCard
+                key={category}
+                category={category}
+                onFocus={(nextCategory) => setActiveFilter(nextCategory)}
+              />
+            ))}
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[1.5rem] bg-white/80 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
-              <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                Visible Foods
+          <div className="grid gap-3">
+            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                Visible foods
               </p>
-              <p className="mt-2 font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
+              <p className="mt-2 font-display text-4xl font-semibold tracking-[-0.04em] text-stone-900">
                 {visibleFoodCount}
               </p>
-              <p className="mt-1 font-sans text-sm text-stone-600">
+              <p className="mt-2 font-sans text-sm text-stone-600">
                 Reference date {format(parseISO(referenceDate), "MMM d, yyyy")}.
               </p>
             </div>
 
-            <div className="rounded-[1.5rem] bg-white/80 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
-              <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                Status Snapshot
+            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                Weekly allergen pulse
               </p>
-              <p className="mt-2 font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                {statusCounts.introduced + statusCounts.satisfied}
+              <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.04em] text-stone-900">
+                {statusCounts.due} due in {weekLabel}
               </p>
-              <p className="mt-1 font-sans text-sm text-stone-600">
-                {statusCounts.pending} pending, {statusCounts.scheduled} coming
-                up, {statusCounts.due} due in {weekLabel}.
+              <p className="mt-2 font-sans text-sm text-stone-600">
+                {statusCounts.introduced + statusCounts.satisfied} foods are already unlocked and stable.
+              </p>
+            </div>
+
+            <div className="rounded-[1.5rem] bg-[#edf2ec] p-4">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                Drag workflow
+              </p>
+              <p className="mt-2 font-sans text-sm leading-6 text-stone-700">
+                Drag from any card here to a calendar day. For mobile, inspect a food first, then use the selected day controls in the inspector.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_auto_auto]">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_auto_auto]">
           <label className="rounded-[1.5rem] bg-white/78 px-4 py-3 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
             <span className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-              Search Foods
+              Search foods
             </span>
             <input
               type="search"
@@ -259,7 +307,7 @@ export function FoodLibraryPanel({
             />
           </label>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {FILTER_OPTIONS.map((option) => {
               const isActive = option.value === activeFilter;
 
@@ -280,7 +328,7 @@ export function FoodLibraryPanel({
             })}
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {STATUS_OPTIONS.map((option) => {
               const isActive = option.value === activeStatus;
 
@@ -348,7 +396,7 @@ export function FoodLibraryPanel({
                   ) : null}
                 </div>
 
-                <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+                <ul className="mt-5 grid gap-3">
                   {section.foods.map((food) => {
                     const status = statusByFoodId.get(food.id);
 
@@ -379,8 +427,7 @@ export function FoodLibraryPanel({
               No foods match this search
             </p>
             <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
-              Clear the search or widen the status and category filters to see
-              more of the library.
+              Clear the search or widen the status and category filters to see more of the library.
             </p>
           </div>
         )}

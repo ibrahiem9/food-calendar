@@ -7,11 +7,12 @@ import {
   parseISO,
   startOfWeek,
 } from "date-fns";
-import { useMemo } from "react";
-import { foods } from "../data/foods";
+import { useEffect, useMemo, useState } from "react";
+import { foods, foodsByCategory } from "../data/foods";
+import { getFoodVisual } from "../data/foodVisuals";
 import { recipesById } from "../data/recipes";
 import type { DayEntry, PlannedItem } from "../types/calendar";
-import type { Food } from "../types/food";
+import { FOOD_CATEGORIES, type Food, type FoodCategory } from "../types/food";
 import {
   buildSingleIntroductionMap,
   getFoodName,
@@ -120,7 +121,7 @@ const getSelectedFoodStatus = (
       reasons: [
         scheduledOnSelectedDay.isFirstIntroduction
           ? "This day currently carries the first single-food introduction."
-          : "This day already uses the food as a repeat, so no first-introduction rule is being consumed here.",
+          : "This day already uses the food as a repeat, so no first-introduction slot is being consumed here.",
       ],
       earliestDate: firstIntroductionDate ?? selectedDay.date,
     };
@@ -321,12 +322,18 @@ export function InspectorPanel({
   selectedFoodId,
   onSelectDay,
   onSelectFood,
+  onAddFood,
+  onRemovePlannedItem,
+  onMovePlannedItem,
 }: {
   days: DayEntry[];
   selectedDayDate: string;
   selectedFoodId: string;
   onSelectDay: (date: string) => void;
   onSelectFood: (foodId: string) => void;
+  onAddFood: (date: string, foodId: string) => void;
+  onRemovePlannedItem: (date: string, itemIndex: number) => void;
+  onMovePlannedItem: (sourceDate: string, itemIndex: number, targetDate: string) => void;
 }) {
   const selectedDay = useMemo(
     () => days.find((day) => day.date === selectedDayDate) ?? days[0],
@@ -346,6 +353,22 @@ export function InspectorPanel({
       ),
     [days],
   );
+  const [selectedCategory, setSelectedCategory] = useState<FoodCategory>(
+    selectedFood?.category ?? "fruit",
+  );
+  const [candidateFoodId, setCandidateFoodId] = useState(selectedFood?.id ?? "");
+  const [moveTargets, setMoveTargets] = useState<Record<number, string>>({});
+
+  useEffect(() => {
+    if (selectedFood) {
+      setSelectedCategory(selectedFood.category);
+      setCandidateFoodId(selectedFood.id);
+    }
+  }, [selectedFood?.category, selectedFood?.id]);
+
+  useEffect(() => {
+    setMoveTargets({});
+  }, [selectedDay?.date]);
 
   if (!selectedDay || !selectedFood) {
     return null;
@@ -357,240 +380,236 @@ export function InspectorPanel({
     selectedFood,
     selectedDayIndex,
   );
+  const candidateFoods = foodsByCategory[selectedCategory];
+  const currentVisual = getFoodVisual(selectedFood.id);
 
   return (
-    <section className="rounded-[2rem] bg-[#eef2ed] p-6 sm:p-7">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl space-y-3">
-            <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-              Inspector
-            </p>
-            <div className="space-y-2">
-              <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Explanations for the selected day and food
+    <section className="rounded-[2rem] bg-[#eef2ed] p-5 sm:p-6">
+      <div className="space-y-4">
+        <div
+          className={`rounded-[1.6rem] bg-gradient-to-br ${currentVisual.accentClassName} p-4`}
+        >
+          <div className="flex items-center gap-4">
+            <img
+              src={currentVisual.imagePath}
+              alt={currentVisual.alt}
+              className="h-20 w-20 rounded-[1.1rem] object-cover"
+            />
+            <div>
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                Context inspector
+              </p>
+              <h2 className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
+                {formatDateLabel(selectedDay.date)}
               </h2>
-              <p className="font-sans text-sm leading-7 text-stone-700">
-                Click any day card or food chip to inspect why it was placed, what rule buffers are active,
-                and whether the selected food is unlocked or blocked on that date.
+              <p className="mt-1 font-sans text-sm text-stone-700">
+                Focused on {selectedFood.name}.
               </p>
             </div>
           </div>
+        </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
-              <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                Selected Day
+        <article className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                Selected day
               </p>
               <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
                 {formatDateLabel(selectedDay.date)}
               </p>
-              <p className="mt-1 font-sans text-sm text-stone-600">
-                {selectedDay.items.length} planned item{selectedDay.items.length === 1 ? "" : "s"}.
-              </p>
             </div>
-
-            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
-              <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                Selected Food
-              </p>
-              <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
-                {selectedFood.name}
-              </p>
-              <p className="mt-1 font-sans text-sm text-stone-600">
-                {selectedFood.isAllergen ? "Allergen" : "Single food"} in the {selectedFood.category} category.
-              </p>
-            </div>
+            <span className="rounded-full bg-[#edf2ec] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-600">
+              {selectedDay.items.length} item{selectedDay.items.length === 1 ? "" : "s"}
+            </span>
           </div>
-        </div>
 
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.95fr)]">
-          <div className="space-y-4">
-            <article className="rounded-[1.5rem] bg-white/82 p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
-                    Day Explanation
-                  </p>
-                  <h3 className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
-                    Why foods were chosen on {format(parseISO(selectedDay.date), "MMM d")}
-                  </h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onSelectDay(highlightedDays[0]?.date ?? selectedDay.date)}
-                  className="rounded-full bg-[#ecefe9] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-stone-700 transition hover:bg-[#e3e7e1]"
-                >
-                  Jump to flagged day
-                </button>
-              </div>
+          <div className="mt-4 grid gap-2">
+            <label className="space-y-2">
+              <span className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
+                Add food category
+              </span>
+              <select
+                value={selectedCategory}
+                onChange={(event) => setSelectedCategory(event.target.value as FoodCategory)}
+                className="w-full rounded-[1rem] bg-[#f6f8f5] px-3 py-3 text-sm text-stone-800 outline-none"
+              >
+                {FOOD_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-2">
+              <span className="font-sans text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
+                Add food
+              </span>
+              <select
+                value={candidateFoodId}
+                onChange={(event) => {
+                  setCandidateFoodId(event.target.value);
+                  onSelectFood(event.target.value);
+                }}
+                className="w-full rounded-[1rem] bg-[#f6f8f5] px-3 py-3 text-sm text-stone-800 outline-none"
+              >
+                {candidateFoods.map((food) => (
+                  <option key={food.id} value={food.id}>
+                    {food.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => candidateFoodId && onAddFood(selectedDay.date, candidateFoodId)}
+              className="rounded-full bg-[linear-gradient(135deg,_#7ea279,_#b9cfa8)] px-4 py-3 text-sm font-semibold text-stone-900 shadow-[0_8px_32px_rgba(45,52,49,0.06)] transition hover:brightness-[1.02]"
+            >
+              Add to selected day
+            </button>
+          </div>
+        </article>
 
-              {selectedDay.validation.errors.length > 0 ||
-              selectedDay.validation.warnings.length > 0 ? (
-                <div className="mt-4 space-y-2">
-                  {selectedDay.validation.errors.map((error, index) => (
-                    <p
-                      key={`selected-error-${index}`}
-                      className="rounded-[1rem] bg-[#f8e1d8] px-3 py-3 font-sans text-sm leading-6 text-stone-800"
-                    >
-                      {error}
-                    </p>
-                  ))}
-                  {selectedDay.validation.warnings.map((warning, index) => (
-                    <p
-                      key={`selected-warning-${index}`}
-                      className="rounded-[1rem] bg-[#efe4d2] px-3 py-3 font-sans text-sm leading-6 text-stone-800"
-                    >
-                      {warning}
-                    </p>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-4 rounded-[1rem] bg-[#edf3ee] px-3 py-3 font-sans text-sm leading-6 text-stone-800">
-                  This day currently passes all active validation checks.
-                </p>
-              )}
+        <article className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+          <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+            Planned items
+          </p>
+          <div className="mt-4 space-y-3">
+            {selectedDay.items.length > 0 ? (
+              selectedDay.items.map((item, index) => {
+                const explanation = getItemExplanation(
+                  days,
+                  selectedDay,
+                  selectedDayIndex,
+                  item,
+                  introMap,
+                );
+                const inspectFoodId =
+                  item.type === "combination"
+                    ? item.ingredientFoodIds?.[0] ?? ""
+                    : item.foodId;
+                const moveTarget =
+                  moveTargets[index] ??
+                  days[selectedDayIndex + 1]?.date ??
+                  selectedDay.date;
 
-              {selectedDay.items.length > 0 ? (
-                <div className="mt-4 space-y-3">
-                  {selectedDay.items.map((item, index) => {
-                    const inspectFoodId =
-                      item.type === "combination"
-                        ? item.ingredientFoodIds?.[0] ?? ""
-                        : item.foodId;
-                    const explanation = getItemExplanation(
-                      days,
-                      selectedDay,
-                      selectedDayIndex,
-                      item,
-                      introMap,
-                    );
-
-                    return (
-                      <article
-                        key={`${selectedDay.date}-${item.foodId}-${index}`}
-                        className="rounded-[1.25rem] bg-[#f6f8f5] p-4"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="font-display text-xl font-semibold tracking-[-0.02em] text-stone-900">
-                              {item.label}
-                            </p>
-                            <p className={`mt-2 inline-flex rounded-sm px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${explanation.tone}`}>
-                              {item.type === "combination" ? "Combination" : item.isFirstIntroduction ? "New intro" : "Repeat"}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            disabled={!inspectFoodId}
-                            onClick={() => {
-                              if (inspectFoodId) {
-                                onSelectFood(inspectFoodId);
-                              }
-                            }}
-                            className="rounded-full bg-[#ecefe9] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-stone-700 transition hover:bg-[#e3e7e1] disabled:cursor-not-allowed disabled:bg-[#e7ebe7] disabled:text-stone-400"
-                          >
-                            {item.type === "combination" ? "Inspect First Ingredient" : "Inspect Food"}
-                          </button>
-                        </div>
-
-                        <p className="mt-3 font-sans text-sm font-medium text-stone-800">
-                          {explanation.title}
+                return (
+                  <div key={`${selectedDay.date}-${item.foodId}-${index}`} className="rounded-[1.1rem] bg-[#f6f8f5] p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-sans text-sm font-semibold text-stone-900">
+                          {item.label}
                         </p>
-                        <ul className="mt-3 space-y-2">
-                          {explanation.details.map((detail, detailIndex) => (
-                            <li
-                              key={`${item.foodId}-detail-${detailIndex}`}
-                              className="rounded-[1rem] bg-white/88 px-3 py-3 font-sans text-sm leading-6 text-stone-700"
-                            >
-                              {detail}
-                            </li>
-                          ))}
-                        </ul>
-                      </article>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="mt-4 rounded-[1rem] bg-white/88 px-3 py-3 font-sans text-sm leading-6 text-stone-700">
-                  No foods are planned here yet. Use the selected food explanation to see whether the day is open
-                  for a new introduction or better suited for a repeat.
-                </p>
-              )}
-            </article>
+                        <p className={`mt-2 inline-flex rounded-sm px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${explanation.tone}`}>
+                          {item.type === "combination"
+                            ? "Combination"
+                            : item.isFirstIntroduction
+                              ? "New intro"
+                              : "Repeat"}
+                        </p>
+                      </div>
+                      {inspectFoodId ? (
+                        <button
+                          type="button"
+                          onClick={() => onSelectFood(inspectFoodId)}
+                          className="rounded-full bg-[#ecefe9] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-700"
+                        >
+                          Inspect
+                        </button>
+                      ) : null}
+                    </div>
+
+                    <p className="mt-3 font-sans text-sm leading-6 text-stone-700">
+                      {explanation.title}
+                    </p>
+
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onRemovePlannedItem(selectedDay.date, index)}
+                        className="rounded-full bg-[#f5ddd4] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-800"
+                      >
+                        Remove
+                      </button>
+                      <input
+                        type="date"
+                        value={moveTarget}
+                        min={days[0]?.date}
+                        max={days[days.length - 1]?.date}
+                        onChange={(event) =>
+                          setMoveTargets((current) => ({
+                            ...current,
+                            [index]: event.target.value,
+                          }))
+                        }
+                        className="rounded-full bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-stone-700 outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onMovePlannedItem(selectedDay.date, index, moveTarget)
+                        }
+                        className="rounded-full bg-[#ecefe9] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-700"
+                      >
+                        Move
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="rounded-[1rem] bg-[#f6f8f5] px-3 py-3 font-sans text-sm leading-6 text-stone-700">
+                No foods are planned here yet.
+              </p>
+            )}
           </div>
+        </article>
 
-          <div className="space-y-4">
-            <article className="rounded-[1.5rem] bg-white/82 p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
-              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
-                Food Explanation
-              </p>
-              <h3 className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
-                Why {selectedFood.name} is allowed or blocked
-              </h3>
-              <p className={`mt-4 rounded-[1rem] px-3 py-3 font-sans text-sm font-medium leading-6 ${selectedFoodStatus.tone}`}>
-                {selectedFoodStatus.title}
-              </p>
-              <ul className="mt-4 space-y-2">
-                {selectedFoodStatus.reasons.map((reason, index) => (
-                  <li
-                    key={`${selectedFood.id}-reason-${index}`}
-                    className="rounded-[1rem] bg-[#f6f8f5] px-3 py-3 font-sans text-sm leading-6 text-stone-700"
-                  >
-                    {reason}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-4 rounded-[1rem] bg-[#eef2ed] px-3 py-3 font-sans text-sm leading-6 text-stone-700">
-                {selectedFoodStatus.earliestDate
-                  ? `Earliest workable first-introduction date from this context: ${formatDateLabel(selectedFoodStatus.earliestDate)}.`
-                  : "No valid first-introduction slot remains in the current planning window from this point forward."}
-              </p>
-            </article>
+        <article className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+          <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+            Food explanation
+          </p>
+          <p className={`mt-4 rounded-[1rem] px-3 py-3 font-sans text-sm font-medium leading-6 ${selectedFoodStatus.tone}`}>
+            {selectedFoodStatus.title}
+          </p>
+          <ul className="mt-4 space-y-2">
+            {selectedFoodStatus.reasons.map((reason, index) => (
+              <li
+                key={`${selectedFood.id}-reason-${index}`}
+                className="rounded-[1rem] bg-[#f6f8f5] px-3 py-3 font-sans text-sm leading-6 text-stone-700"
+              >
+                {reason}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 rounded-[1rem] bg-[#eef2ed] px-3 py-3 font-sans text-sm leading-6 text-stone-700">
+            {selectedFoodStatus.earliestDate
+              ? `Earliest workable first-introduction date from this context: ${formatDateLabel(selectedFoodStatus.earliestDate)}.`
+              : "No valid first-introduction slot remains in the current planning window from this point forward."}
+          </p>
+        </article>
 
-            <article className="rounded-[1.5rem] bg-white/82 p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
-              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
-                Quick Picks
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {highlightedDays.slice(0, 6).map((day) => (
-                  <button
-                    key={day.date}
-                    type="button"
-                    onClick={() => onSelectDay(day.date)}
-                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      day.date === selectedDay.date
-                        ? "bg-[linear-gradient(135deg,_#7ea279,_#b9cfa8)] text-stone-900 shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
-                        : "bg-[#ecefe9] text-stone-700 hover:bg-[#e3e7e1]"
-                    }`}
-                  >
-                    {format(parseISO(day.date), "MMM d")}
-                  </button>
-                ))}
-              </div>
-              <p className="mt-4 font-sans text-sm leading-6 text-stone-700">
-                These days are the fastest way to inspect first introductions or current rule violations.
-              </p>
-            </article>
-
-            <article className="rounded-[1.5rem] bg-white/82 p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
-              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
-                Tips
-              </p>
-              <ul className="mt-4 space-y-2">
-                <li className="rounded-[1rem] bg-[#f6f8f5] px-3 py-3 font-sans text-sm leading-6 text-stone-700">
-                  If an allergen is introduced today, the next allergen intro should wait until four calendar dates later.
-                </li>
-                <li className="rounded-[1rem] bg-[#f6f8f5] px-3 py-3 font-sans text-sm leading-6 text-stone-700">
-                  If yesterday already introduced a new single food, today should usually be used for repeats instead.
-                </li>
-                <li className="rounded-[1rem] bg-[#f6f8f5] px-3 py-3 font-sans text-sm leading-6 text-stone-700">
-                  Combinations stay blocked before May 1, 2026 and until every ingredient has an earlier single-food intro.
-                </li>
-              </ul>
-            </article>
+        <article className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+          <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+            Quick picks
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {highlightedDays.slice(0, 6).map((day) => (
+              <button
+                key={day.date}
+                type="button"
+                onClick={() => onSelectDay(day.date)}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  day.date === selectedDay.date
+                    ? "bg-[linear-gradient(135deg,_#7ea279,_#b9cfa8)] text-stone-900 shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
+                    : "bg-[#ecefe9] text-stone-700 hover:bg-[#e3e7e1]"
+                }`}
+              >
+                {format(parseISO(day.date), "MMM d")}
+              </button>
+            ))}
           </div>
-        </div>
+        </article>
       </div>
     </section>
   );

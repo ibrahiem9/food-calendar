@@ -1,9 +1,13 @@
 import { format, isBefore, parseISO } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { foods } from "../data/foods";
+import { recipeHeroVisual } from "../data/foodVisuals";
 import { recipes } from "../data/recipes";
 import type { DayEntry } from "../types/calendar";
-import { buildSingleIntroductionMap, getRecipeEligibilityForDate } from "../utils/recipeEligibility";
+import {
+  buildSingleIntroductionMap,
+  getRecipeEligibilityForDate,
+} from "../utils/recipeEligibility";
 import { COMBINATION_START_DATE } from "../validators/validateCombinationStartDate";
 
 const FOOD_NAME_BY_ID = new Map(foods.map((food) => [food.id, food.name]));
@@ -74,6 +78,7 @@ export function CombinationPlannerPanel({
     [days, introMap, selectedDate],
   );
   const eligibleCount = recipeStatuses.filter((status) => status.eligible).length;
+  const blockedCount = recipeStatuses.length - eligibleCount;
 
   const handleAddRecipe = (recipeId: string, recipeName: string) => {
     if (!selectedDate) {
@@ -91,54 +96,29 @@ export function CombinationPlannerPanel({
   };
 
   return (
-    <section className="rounded-[2rem] bg-[#eff3f6] p-6 sm:p-7">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl space-y-3">
-            <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-              Combination Planner
+    <section className="rounded-[2rem] bg-[#eff3f6] p-5 sm:p-6">
+      <div className="grid gap-5 xl:grid-cols-[21rem_minmax(0,1fr)]">
+        <aside className="space-y-4">
+          <div
+            className={`overflow-hidden rounded-[1.7rem] bg-gradient-to-br ${recipeHeroVisual.accentClassName} p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]`}
+          >
+            <img
+              src={recipeHeroVisual.imagePath}
+              alt={recipeHeroVisual.alt}
+              className="h-44 w-full rounded-[1.25rem] object-cover"
+            />
+            <p className="mt-4 font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+              Recipe builder
             </p>
-            <div className="space-y-2">
-              <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Recipe eligibility by calendar day
-              </h2>
-              <p className="font-sans text-sm leading-7 text-stone-700">
-                Combination foods stay blocked until May 1, 2026 and every
-                ingredient has already appeared as a single food on an earlier
-                day. Eligibility and add actions run through the same checks.
-              </p>
-            </div>
+            <h3 className="mt-2 font-display text-3xl font-semibold tracking-[-0.04em] text-stone-900">
+              Visual combo planning
+            </h3>
+            <p className="mt-2 font-sans text-sm leading-6 text-stone-700">
+              Use the selected day as your staging point, then review which ingredient sets are already unlocked.
+            </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[1.5rem] bg-white/80 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
-              <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                Selected Day
-              </p>
-              <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
-                {selectedDate ? formatDateLabel(selectedDate) : "Unavailable"}
-              </p>
-              <p className="mt-1 font-sans text-sm text-stone-600">
-                Earliest combo date is May 1, 2026.
-              </p>
-            </div>
-
-            <div className="rounded-[1.5rem] bg-white/80 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
-              <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                Eligible Recipes
-              </p>
-              <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
-                {eligibleCount} / {recipes.length}
-              </p>
-              <p className="mt-1 font-sans text-sm text-stone-600">
-                Recipes with all ingredients already unlocked for this date.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)]">
-          <div className="rounded-[1.5rem] bg-white/78 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
+          <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
             <label className="space-y-2">
               <span className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
                 Plan combinations on
@@ -156,29 +136,94 @@ export function CombinationPlannerPanel({
               </select>
             </label>
 
-            <p className="mt-4 rounded-[1rem] bg-[#eef2ed] px-3 py-3 font-sans text-sm leading-6 text-stone-700">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              <div className="rounded-[1rem] bg-[#eef2ed] px-3 py-3">
+                <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                  Selected day
+                </p>
+                <p className="mt-1 font-display text-xl font-semibold tracking-[-0.03em] text-stone-900">
+                  {selectedDate ? formatDateLabel(selectedDate) : "Unavailable"}
+                </p>
+              </div>
+              <div className="rounded-[1rem] bg-[#e7eef8] px-3 py-3">
+                <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                  Eligibility split
+                </p>
+                <p className="mt-1 font-display text-xl font-semibold tracking-[-0.03em] text-stone-900">
+                  {eligibleCount} ready / {blockedCount} blocked
+                </p>
+              </div>
+            </div>
+
+            <p className="mt-4 rounded-[1rem] bg-[#f6f8f5] px-3 py-3 font-sans text-sm leading-6 text-stone-700">
               {feedbackMessage ||
                 "Choose a date, review blocked reasons, then add any eligible recipe directly into the calendar."}
             </p>
+          </div>
+
+          <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+            <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+              Ingredient sets
+            </p>
+            <div className="mt-4 space-y-3">
+              {recipes.map((recipe) => (
+                <div key={recipe.id} className="rounded-[1rem] bg-[#f6f8f5] px-3 py-3">
+                  <p className="font-sans text-sm font-semibold text-stone-900">
+                    {recipe.name}
+                  </p>
+                  <p className="mt-1 font-sans text-xs leading-5 text-stone-500">
+                    {recipe.ingredientFoodIds
+                      .map((foodId) => FOOD_NAME_BY_ID.get(foodId) ?? foodId)
+                      .join(", ")}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+        <div className="space-y-5">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                Earliest combo gate
+              </p>
+              <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
+                May 1, 2026
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                Eligible recipes
+              </p>
+              <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
+                {eligibleCount}/{recipes.length}
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                Already planned
+              </p>
+              <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
+                {recipeStatuses.reduce((count, status) => count + status.scheduledCount, 0)}
+              </p>
+            </div>
           </div>
 
           <div className="grid gap-4 xl:grid-cols-2">
             {recipeStatuses.map((status) => (
               <article
                 key={status.recipe.id}
-                className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl"
+                className="rounded-[1.6rem] bg-white/82 p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
+                    <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                      Curated recipe
+                    </p>
+                    <h3 className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
                       {status.recipe.name}
-                    </p>
-                    <p className="mt-1 font-sans text-sm text-stone-600">
-                      Ingredients:{" "}
-                      {status.recipe.ingredientFoodIds
-                        .map((foodId) => FOOD_NAME_BY_ID.get(foodId) ?? foodId)
-                        .join(", ")}
-                    </p>
+                    </h3>
                   </div>
                   <span
                     className={`rounded-sm px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${
@@ -189,6 +234,22 @@ export function CombinationPlannerPanel({
                   >
                     {status.eligible ? "Eligible" : "Blocked"}
                   </span>
+                </div>
+
+                <div className="mt-4 rounded-[1.25rem] bg-[#f5f7f8] p-4">
+                  <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                    Ingredient line-up
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {status.recipe.ingredientFoodIds.map((foodId) => (
+                      <span
+                        key={`${status.recipe.id}-${foodId}`}
+                        className="rounded-full bg-white px-3 py-2 text-sm font-medium text-stone-700"
+                      >
+                        {FOOD_NAME_BY_ID.get(foodId) ?? foodId}
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -213,8 +274,7 @@ export function CombinationPlannerPanel({
                   </ul>
                 ) : (
                   <p className="mt-4 rounded-[1rem] bg-[#edf3ee] px-3 py-3 font-sans text-sm leading-6 text-stone-800">
-                    All ingredients were introduced earlier as singles. This
-                    recipe can be placed on the selected day.
+                    All ingredients were introduced earlier as singles. This recipe can be placed on the selected day.
                   </p>
                 )}
 

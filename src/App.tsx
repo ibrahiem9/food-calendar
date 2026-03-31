@@ -1,15 +1,50 @@
-import { useEffect, useState } from "react";
-import { CalendarView } from "./components/CalendarView";
-import { CombinationPlannerPanel } from "./components/CombinationPlannerPanel";
+import { useEffect, useMemo, useState } from "react";
 import { ConflictResolutionModal } from "./components/ConflictResolutionModal";
-import { FoodLibraryPanel } from "./components/FoodLibraryPanel";
 import { InspectorPanel } from "./components/InspectorPanel";
-import { RuleStatusPanel } from "./components/RuleStatusPanel";
-import { ValidationPanel } from "./components/ValidationPanel";
+import { CalendarScreen } from "./components/screens/CalendarScreen";
+import { LibraryScreen } from "./components/screens/LibraryScreen";
+import { RecipesScreen } from "./components/screens/RecipesScreen";
+import { RulesScreen } from "./components/screens/RulesScreen";
+import { MobileNavDrawer } from "./components/shell/MobileNavDrawer";
+import { SidebarNav } from "./components/shell/SidebarNav";
+import { TopBar } from "./components/shell/TopBar";
 import { foods } from "./data/foods";
 import { recipes } from "./data/recipes";
 import { usePlannerStore } from "./store/plannerStore";
+import type { AppView } from "./types/appShell";
 import { downloadPlannerCsv } from "./utils/csvExport";
+
+const NAV_ITEMS: Array<{
+  id: AppView;
+  label: string;
+  description: string;
+  icon: string;
+}> = [
+  {
+    id: "calendar",
+    label: "Calendar",
+    description: "Focused month and week planning canvas",
+    icon: "◫",
+  },
+  {
+    id: "library",
+    label: "Food Library",
+    description: "Search, inspect, and drag foods into the plan",
+    icon: "◌",
+  },
+  {
+    id: "rules",
+    label: "Rules Checklist",
+    description: "Compliance dashboard and live validation feed",
+    icon: "△",
+  },
+  {
+    id: "recipes",
+    label: "Recipes",
+    description: "Combination planner with unlock checks",
+    icon: "✦",
+  },
+];
 
 function App() {
   const days = usePlannerStore((state) => state.days);
@@ -46,6 +81,10 @@ function App() {
   const [saveMessage, setSaveMessage] = useState("");
   const [inspectedDayDate, setInspectedDayDate] = useState("");
   const [inspectedFoodId, setInspectedFoodId] = useState(foods[0]?.id ?? "");
+  const [activeView, setActiveView] = useState<AppView>("calendar");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [mobileInspectorOpen, setMobileInspectorOpen] = useState(false);
+
   const scheduledFirstIntroductions = days.reduce(
     (count, day) =>
       count + day.items.filter((item) => item.isFirstIntroduction).length,
@@ -61,9 +100,6 @@ function App() {
       count + day.items.filter((item) => item.type === "combination").length,
     0,
   );
-  const firstIntroductionDays = days.filter((day) =>
-    day.items.some((item) => item.isFirstIntroduction),
-  ).length;
   const populatedDays = days.filter((day) => day.items.length > 0).length;
   const hasValidationErrors = days.some((day) => day.validation.errors.length > 0);
 
@@ -117,42 +153,98 @@ function App() {
     return () => window.clearTimeout(timeout);
   }, [saveMessage]);
 
-  const handleSave = () => {
-    savePlan();
-    setSaveMessage(
-      hasValidationErrors ? "Plan saved locally with warnings" : "Plan saved locally",
-    );
-  };
+  const selectedDay = days.find((day) => day.date === inspectedDayDate);
+  const statusMessage = saveMessage
+    ? saveMessage
+    : `Coverage ${populatedDays}/${days.length || 0} days, ${scheduledFirstIntroductions} intros, ${repeatCount} repeats${combinationCount > 0 ? `, ${combinationCount} recipes` : ""}.`;
 
-  const handleGenerate = () => {
-    const summary = generateFirstIntroductions();
+  const primaryAction = (
+    <button
+      type="button"
+      onClick={() => {
+        setActiveView("calendar");
+        const summary = generateFirstIntroductions();
 
-    setSaveMessage(
-      summary.unscheduledFoodIds.length === 0
-        ? `Generated ${summary.populatedDayCount} populated days with ${summary.scheduledCount} first introductions`
-        : `Generated ${summary.populatedDayCount} populated days. ${summary.unscheduledFoodIds.length} foods could not be introduced.`,
-    );
-  };
+        setSaveMessage(
+          summary.unscheduledFoodIds.length === 0
+            ? `Generated ${summary.populatedDayCount} populated days with ${summary.scheduledCount} first introductions`
+            : `Generated ${summary.populatedDayCount} populated days. ${summary.unscheduledFoodIds.length} foods could not be introduced.`,
+        );
+      }}
+      className="w-full rounded-full bg-[linear-gradient(135deg,_#7ea279,_#b9cfa8)] px-5 py-3 text-sm font-semibold text-stone-900 shadow-[0_8px_32px_rgba(45,52,49,0.06)] transition hover:brightness-[1.02]"
+    >
+      Generate Calendar
+    </button>
+  );
 
-  const handleClearAll = () => {
-    clearAllDays();
-    setSaveMessage("Calendar reset");
-  };
+  const actionBar = (
+    <div className="flex flex-wrap gap-2">
+      {primaryAction}
+      <button
+        type="button"
+        onClick={() => {
+          savePlan();
+          setSaveMessage(
+            hasValidationErrors ? "Plan saved locally with warnings" : "Plan saved locally",
+          );
+        }}
+        className="rounded-full bg-[#ecefe9] px-4 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#e3e7e1]"
+      >
+        {hasValidationErrors ? "Save with Warnings" : "Save Plan"}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const exported = downloadPlannerCsv({ days, foods });
 
-  const handleExportCsv = () => {
-    const exported = downloadPlannerCsv({ days, foods });
-
-    setSaveMessage(
-      exported
-        ? `Exported ${days.length} days to CSV`
-        : "Nothing to export yet. Add foods or generate the calendar first.",
-    );
-  };
-
-  const handlePrint = () => {
-    window.print();
-    setSaveMessage("Opened print preview");
-  };
+          setSaveMessage(
+            exported
+              ? `Exported ${days.length} days to CSV`
+              : "Nothing to export yet. Add foods or generate the calendar first.",
+          );
+        }}
+        className="rounded-full bg-[#dfe9df] px-4 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#d5e1d4]"
+      >
+        Export CSV
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          window.print();
+          setSaveMessage("Opened print preview");
+        }}
+        className="rounded-full bg-[#e4ebe3] px-4 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#dae4d9]"
+      >
+        Print
+      </button>
+      <button
+        type="button"
+        onClick={undo}
+        disabled={!canUndo}
+        className="rounded-full bg-[#ecefe9] px-4 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#e3e7e1] disabled:cursor-not-allowed disabled:opacity-45"
+      >
+        Undo
+      </button>
+      <button
+        type="button"
+        onClick={redo}
+        disabled={!canRedo}
+        className="rounded-full bg-[#ecefe9] px-4 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#e3e7e1] disabled:cursor-not-allowed disabled:opacity-45"
+      >
+        Redo
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          clearAllDays();
+          setSaveMessage("Calendar reset");
+        }}
+        className="rounded-full bg-[#f1e2da] px-4 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#ecd6cb]"
+      >
+        Clear All
+      </button>
+    </div>
+  );
 
   const handleAddFood = (date: string, foodId: string) => {
     const result = requestAddFoodToDay(date, foodId);
@@ -220,194 +312,190 @@ function App() {
     setSaveMessage("Edit cancelled");
   };
 
+  const mainWorkspace = useMemo(() => {
+    if (activeView === "library") {
+      return (
+        <LibraryScreen
+          days={days}
+          selectedFoodId={inspectedFoodId}
+          onInspectFood={setInspectedFoodId}
+        />
+      );
+    }
+
+    if (activeView === "rules") {
+      return <RulesScreen days={days} onSelectDay={setInspectedDayDate} />;
+    }
+
+    if (activeView === "recipes") {
+      return <RecipesScreen days={days} onAddRecipe={addRecipeToDay} />;
+    }
+
+    return (
+      <CalendarScreen
+        days={days}
+        onAddFood={handleAddFood}
+        onMovePlannedItem={handleMovePlannedItem}
+        onRemovePlannedItem={handleRemovePlannedItem}
+        selectedDayDate={inspectedDayDate}
+        selectedFoodId={inspectedFoodId}
+        onSelectDay={setInspectedDayDate}
+        onSelectFood={setInspectedFoodId}
+      />
+    );
+  }, [activeView, addRecipeToDay, days, inspectedDayDate, inspectedFoodId]);
+
+  const showInspector = activeView === "calendar" || activeView === "library";
+
   return (
     <main
-      className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(152,196,255,0.2),_transparent_38%),linear-gradient(180deg,_#f8faf7_0%,_#edf3ee_100%)] px-5 py-8 text-stone-800 sm:px-8 sm:py-10"
+      className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(152,196,255,0.18),_transparent_28%),radial-gradient(circle_at_top_right,_rgba(185,207,168,0.26),_transparent_34%),linear-gradient(180deg,_#f8faf7_0%,_#edf3ee_100%)] px-4 py-6 text-stone-800 sm:px-6 sm:py-8"
       data-print-root
     >
-      <div className="mx-auto flex max-w-7xl flex-col gap-8">
-        <header
-          className="overflow-hidden rounded-[2rem] bg-white/80 p-6 shadow-[0_8px_32px_rgba(45,52,49,0.06)] ring-1 ring-white/60 backdrop-blur-xl sm:p-8"
-          data-print-hide
-        >
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl space-y-4">
-              <p className="font-sans text-xs font-semibold uppercase tracking-[0.3em] text-sky-700/70">
-                Baby Food Introduction Planner
-              </p>
-              <div className="space-y-3">
-                <h1 className="font-display text-4xl font-semibold tracking-[-0.03em] text-stone-900 sm:text-5xl">
-                  BabyBite Calendar
-                </h1>
-                <p className="max-w-2xl font-sans text-sm leading-6 text-stone-700 sm:text-base">
-                  Build and manage a baby food introduction plan with one
-                  rule-aware calendar. Generate first introductions, fill empty
-                  days with repeats, track weekly allergen maintenance, unlock
-                  recipes as ingredients are introduced, and adjust any day
-                  without losing validation context.
-                </p>
-              </div>
-            </div>
+      <MobileNavDrawer
+        open={mobileNavOpen}
+        items={NAV_ITEMS.map((item) => ({ ...item, icon: <span>{item.icon}</span> }))}
+        activeView={activeView}
+        onChangeView={(view) => {
+          setActiveView(view);
+          setMobileInspectorOpen(false);
+        }}
+        onClose={() => setMobileNavOpen(false)}
+        actionSlot={primaryAction}
+      />
 
-            <div className="grid gap-3 lg:min-w-[24rem]">
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={handleGenerate}
-                  className="rounded-full bg-[linear-gradient(135deg,_#7ea279,_#b9cfa8)] px-5 py-3 text-sm font-semibold text-stone-900 shadow-[0_8px_32px_rgba(45,52,49,0.06)] transition hover:brightness-[1.02]"
-                >
-                  Generate Calendar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="rounded-full bg-[#ecefe9] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#e3e7e1]"
-                >
-                  {hasValidationErrors ? "Save with Warnings" : "Save Plan"}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleClearAll}
-                  className="rounded-full bg-[#f1e2da] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#ecd6cb]"
-                >
-                  Clear All Days
-                </button>
-                <button
-                  type="button"
-                  onClick={handleExportCsv}
-                  className="rounded-full bg-[#dfe9df] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#d5e1d4]"
-                >
-                  Export CSV
-                </button>
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="rounded-full bg-[#e4ebe3] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#dae4d9]"
-                >
-                  Print
-                </button>
-                <button
-                  type="button"
-                  onClick={undo}
-                  disabled={!canUndo}
-                  className="rounded-full bg-[#ecefe9] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#e3e7e1] disabled:cursor-not-allowed disabled:opacity-45"
-                >
-                  Undo
-                </button>
-                <button
-                  type="button"
-                  onClick={redo}
-                  disabled={!canRedo}
-                  className="rounded-full bg-[#ecefe9] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#e3e7e1] disabled:cursor-not-allowed disabled:opacity-45"
-                >
-                  Redo
-                </button>
-              </div>
+      <div className="mx-auto flex max-w-[1600px] gap-4">
+        <SidebarNav
+          items={NAV_ITEMS.map((item) => ({ ...item, icon: <span>{item.icon}</span> }))}
+          activeView={activeView}
+          onChangeView={(view) => {
+            setActiveView(view);
+            setMobileInspectorOpen(false);
+          }}
+          primaryAction={primaryAction}
+        />
 
-              <div className="min-h-[1.5rem] font-sans text-sm text-stone-500">
-                {saveMessage ||
-                  "Generate a full plan, edit any day, keep allergens on cadence, and export the calendar when you are ready to share it."}
-              </div>
+        <div className="min-w-0 flex-1 space-y-4">
+          <TopBar
+            items={NAV_ITEMS}
+            activeView={activeView}
+            onChangeView={(view) => {
+              setActiveView(view);
+              setMobileInspectorOpen(false);
+            }}
+            onOpenMobileNav={() => setMobileNavOpen(true)}
+            statusMessage={statusMessage}
+            actionSlot={actionBar}
+          />
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.5rem] bg-[#f1f4f1] p-4">
-                  <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                    Planner Overview
+          {warningBanner ? (
+            <section
+              className="rounded-[1.75rem] bg-[#f4e0d5] p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
+              data-print-hide
+            >
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-600">
+                    Warning Banner
                   </p>
-                  <p className="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-stone-900">
-                    Complete planning workspace
-                  </p>
-                  <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
-                    The planner combines calendar editing, live rule checks,
-                    recipe eligibility, CSV export, print support, drag from
-                    the food library, and undo/redo in one surface. {recipes.length} curated
-                    recipes are available once their ingredients have been
-                    introduced.
+                  <p className="mt-2 font-sans text-sm leading-7 text-stone-800">
+                    {warningBanner}
                   </p>
                 </div>
-
-                <div className="rounded-[1.5rem] bg-[#f1f4f1] p-4">
-                  <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                    Calendar Coverage
-                  </p>
-                  <p className="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-stone-900">
-                    {populatedDays} / {days.length || 0}
-                  </p>
-                  <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
-                    {scheduledFirstIntroductions} first introductions and{" "}
-                    {repeatCount} repeat placements currently occupy{" "}
-                    {firstIntroductionDays} intro days across the full plan.
-                    {combinationCount > 0
-                      ? ` ${combinationCount} combination recipes are also scheduled.`
-                      : ""}
-                  </p>
-                </div>
+                <button
+                  type="button"
+                  onClick={clearWarningBanner}
+                  className="rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-stone-700 transition hover:bg-white"
+                >
+                  Dismiss
+                </button>
               </div>
-            </div>
-          </div>
-        </header>
+            </section>
+          ) : null}
 
-        {warningBanner ? (
-          <section
-            className="rounded-[1.75rem] bg-[#f4e0d5] p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
-            data-print-hide
-          >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-600">
-                  Warning Banner
-                </p>
-                <p className="mt-2 font-sans text-sm leading-7 text-stone-800">
-                  {warningBanner}
-                </p>
-              </div>
+          {(activeView === "calendar" || activeView === "library") && (
+            <div className="xl:hidden" data-print-hide>
               <button
                 type="button"
-                onClick={clearWarningBanner}
-                className="rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-stone-700 transition hover:bg-white"
+                onClick={() => setMobileInspectorOpen((current) => !current)}
+                className="w-full rounded-[1.6rem] bg-white/78 px-5 py-4 text-left shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
               >
-                Dismiss
+                <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                  Inspector
+                </p>
+                <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
+                  {selectedDay ? selectedDay.date : "Select a day"}
+                </p>
+                <p className="mt-1 font-sans text-sm text-stone-600">
+                  {mobileInspectorOpen ? "Hide" : "Show"} selected-day controls and food explanation.
+                </p>
               </button>
             </div>
-          </section>
-        ) : null}
+          )}
 
-        <div data-print-hide>
-          <RuleStatusPanel days={days} onSelectDay={setInspectedDayDate} />
-        </div>
-        <div data-print-hide>
-          <ValidationPanel days={days} />
-        </div>
-        <div data-print-hide>
-          <InspectorPanel
-            days={days}
-            selectedDayDate={inspectedDayDate}
-            selectedFoodId={inspectedFoodId}
-            onSelectDay={setInspectedDayDate}
-            onSelectFood={setInspectedFoodId}
-          />
-        </div>
-        <div data-print-hide>
-          <CombinationPlannerPanel days={days} onAddRecipe={addRecipeToDay} />
-        </div>
-        <CalendarView
-          days={days}
-          onAddFood={handleAddFood}
-          onMovePlannedItem={handleMovePlannedItem}
-          onRemovePlannedItem={handleRemovePlannedItem}
-          selectedDayDate={inspectedDayDate}
-          selectedFoodId={inspectedFoodId}
-          onSelectDay={setInspectedDayDate}
-          onSelectFood={setInspectedFoodId}
-        />
-        <div data-print-hide>
-          <FoodLibraryPanel
-            days={days}
-            selectedFoodId={inspectedFoodId}
-            onInspectFood={setInspectedFoodId}
-          />
+          <div className={`grid gap-4 ${showInspector ? "xl:grid-cols-[minmax(0,1fr)_24rem]" : ""}`}>
+            <div className="min-w-0">{mainWorkspace}</div>
+
+            {showInspector ? (
+              <div
+                className={`${mobileInspectorOpen ? "block" : "hidden"} xl:block`}
+                data-print-hide
+              >
+                <InspectorPanel
+                  days={days}
+                  selectedDayDate={inspectedDayDate}
+                  selectedFoodId={inspectedFoodId}
+                  onSelectDay={(date) => {
+                    setInspectedDayDate(date);
+                    setActiveView("calendar");
+                  }}
+                  onSelectFood={setInspectedFoodId}
+                  onAddFood={handleAddFood}
+                  onRemovePlannedItem={handleRemovePlannedItem}
+                  onMovePlannedItem={handleMovePlannedItem}
+                />
+              </div>
+            ) : null}
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3" data-print-hide>
+            <div className="rounded-[1.5rem] bg-white/76 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                Planner overview
+              </p>
+              <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
+                One active workspace
+              </p>
+              <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
+                Desktop keeps the sidebar and top bar persistent while mobile shifts navigation and secondary controls into drawers.
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] bg-white/76 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                Calendar coverage
+              </p>
+              <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
+                {populatedDays}/{days.length || 0}
+              </p>
+              <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
+                {scheduledFirstIntroductions} first introductions with {repeatCount} repeats and {recipes.length} curated recipes available.
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] bg-white/76 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                Selected food
+              </p>
+              <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em] text-stone-900">
+                {foods.find((food) => food.id === inspectedFoodId)?.name ?? "None"}
+              </p>
+              <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
+                Inspect from the library or any day summary, then use the right rail to place or move items.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
+
       <ConflictResolutionModal
         conflict={pendingConflict}
         onCancel={handleCancelConflict}
