@@ -1,29 +1,18 @@
+import { recipesById } from "../data/recipes";
 import { foods } from "../data/foods";
 import type { DayEntry } from "../types/calendar";
+import { buildSingleIntroductionMap } from "../utils/recipeEligibility";
 import { createValidationResult, mergeValidationResults } from "./validationUtils";
 import { validateAllergenSpacing } from "./validateAllergenSpacing";
 import { validateCombinationIngredients } from "./validateCombinationIngredients";
 import { validateCombinationStartDate } from "./validateCombinationStartDate";
 import { validateDailyMinimum } from "./validateDailyMinimum";
 import { validateNoConsecutiveNewFoods } from "./validateNoConsecutiveNewFoods";
+import { validateRecipeRestrictions } from "./validateRecipeRestrictions";
 import { validateWeeklyAllergenCadence } from "./validateWeeklyAllergenCadence";
 
-const buildIntroductionMap = (days: DayEntry[]) => {
-  const introMap = new Map<string, string>();
-
-  for (const day of days) {
-    for (const item of day.items) {
-      if (item.isFirstIntroduction && !introMap.has(item.foodId)) {
-        introMap.set(item.foodId, day.date);
-      }
-    }
-  }
-
-  return introMap;
-};
-
 export const runAllValidations = (days: DayEntry[]): DayEntry[] => {
-  const introMap = buildIntroductionMap(days);
+  const introMap = buildSingleIntroductionMap(days);
   const allergenValidationByDay = new Map<string, string[]>();
 
   for (const allergen of foods.filter((food) => food.isAllergen)) {
@@ -45,12 +34,21 @@ export const runAllValidations = (days: DayEntry[]): DayEntry[] => {
   }
 
   return days.map((day, index) => {
+    const recipeRestrictionResult = createValidationResult(
+      day.items
+        .filter((item) => item.type === "combination" && item.recipeId)
+        .flatMap((item) => {
+          const recipe = recipesById.get(item.recipeId ?? "");
+          return recipe ? validateRecipeRestrictions(recipe).errors : [];
+        }),
+    );
     const result = mergeValidationResults(
       validateDailyMinimum(day),
       validateNoConsecutiveNewFoods(days, index),
       validateAllergenSpacing(days, index),
       validateCombinationStartDate(day),
       validateCombinationIngredients(day, introMap),
+      recipeRestrictionResult,
       createValidationResult(allergenValidationByDay.get(day.date) ?? []),
     );
 

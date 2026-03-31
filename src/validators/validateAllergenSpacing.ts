@@ -15,7 +15,10 @@ export const validateAllergenSpacing = (days: DayEntry[], index: number) => {
   }
 
   const currentAllergens = day.items.filter(
-    (item) => item.isFirstIntroduction && allergenIds.has(item.foodId),
+    (item) =>
+      item.type === "single" &&
+      item.isFirstIntroduction &&
+      allergenIds.has(item.foodId),
   );
 
   if (currentAllergens.length === 0) {
@@ -27,7 +30,10 @@ export const validateAllergenSpacing = (days: DayEntry[], index: number) => {
   for (let previousIndex = index - 1; previousIndex >= 0; previousIndex -= 1) {
     const previousDay = days[previousIndex];
     const previousAllergens = previousDay.items.filter(
-      (item) => item.isFirstIntroduction && allergenIds.has(item.foodId),
+      (item) =>
+        item.type === "single" &&
+        item.isFirstIntroduction &&
+        allergenIds.has(item.foodId),
     );
 
     if (previousAllergens.length === 0) {

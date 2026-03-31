@@ -31,13 +31,13 @@ export function ValidationPanel({ days }: { days: DayEntry[] }) {
             </p>
             <div className="space-y-2">
               <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Phase 6 rule feedback
+                Phase 9 rule feedback
               </h2>
               <p className="font-sans text-sm leading-7 text-stone-700">
-                Auto-generated first introductions and repeat fills run through
-                the same validators as manual edits. Daily minimum failures
-                should now indicate a real scheduling gap instead of expected
-                Phase 5 behavior.
+                Single foods, generated repeats, and combination recipes all
+                run through the same validators. Ingredient unlock failures and
+                combo start-date violations surface here alongside the existing
+                spacing and cadence checks.
               </p>
             </div>
           </div>

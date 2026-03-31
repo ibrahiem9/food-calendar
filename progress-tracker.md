@@ -70,10 +70,11 @@ Use this file to track your progress through the 18 phases.
   - Recipe restrictions tracked
   - Verification completed on 2026-03-31: `npm run build`
   
-- [ ] **Phase 9:** Combination Validation & Scheduling
+- [x] **Phase 9:** Combination Validation & Scheduling
   - Combinations blocked before May 1
   - Ingredient validation working
   - Combination Planner UI functional
+  - Verification completed on 2026-03-31: `npm run build`
   
 - [ ] **Phase 10:** Manual Editing & Conflict Resolution
   - Drag-and-drop working
@@ -235,8 +236,8 @@ Track any problems or decisions here:
 | 5 | 3-4 hours | 2 hours | Deterministic first-introduction planner, generation UI, tracker update, and verification |
 | 6 | 1-2 hours | 1 hour | Deterministic repeat-fill pass, UI/status copy refresh, tracker update, and build verification |
 | 7 | 3-4 hours | 2 hours | Weekly allergen repetition pass, cadence UI, tracker update, and zero-error generation verification |
-| 8 | 1 hour | | |
-| 9 | 2-3 hours | | |
+| 8 | 1 hour | 1 hour | Curated recipe catalog, types, and build verification |
+| 9 | 2-3 hours | 2 hours | Combination eligibility utility, planner UI, store actions, and build verification |
 | 10 | 2-3 hours | | |
 | 11 | 2 hours | | |
 | 12 | 2 hours | | |
@@ -252,7 +253,7 @@ Track any problems or decisions here:
 
 ## Current Focus
 
-**Currently working on Phase:** 8
-**Next up:** Define the recipe data model and add curated combination-food recipes with restriction flags.
+**Currently working on Phase:** 10
+**Next up:** Add manual editing conflict resolution, richer edit controls, and undo/redo support.
 
 **Blocked by:** None

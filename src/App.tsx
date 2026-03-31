@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { CalendarView } from "./components/CalendarView";
+import { CombinationPlannerPanel } from "./components/CombinationPlannerPanel";
 import { FoodLibraryPanel } from "./components/FoodLibraryPanel";
 import { ValidationPanel } from "./components/ValidationPanel";
 import { recipes } from "./data/recipes";
@@ -9,7 +10,8 @@ function App() {
   const days = usePlannerStore((state) => state.days);
   const initializeDays = usePlannerStore((state) => state.initializeDays);
   const addFoodToDay = usePlannerStore((state) => state.addFoodToDay);
-  const removeFoodFromDay = usePlannerStore((state) => state.removeFoodFromDay);
+  const addRecipeToDay = usePlannerStore((state) => state.addRecipeToDay);
+  const removePlannedItem = usePlannerStore((state) => state.removePlannedItem);
   const generateFirstIntroductions = usePlannerStore(
     (state) => state.generateFirstIntroductions,
   );
@@ -24,6 +26,11 @@ function App() {
   const repeatCount = days.reduce(
     (count, day) =>
       count + day.items.filter((item) => !item.isFirstIntroduction).length,
+    0,
+  );
+  const combinationCount = days.reduce(
+    (count, day) =>
+      count + day.items.filter((item) => item.type === "combination").length,
     0,
   );
   const firstIntroductionDays = days.filter((day) =>
@@ -86,7 +93,8 @@ function App() {
                   Manual planning and first-introduction generation now share
                   the same rule-aware calendar. You can seed the full catalog,
                   backfill empty dates with repeat foods, keep allergen cadence
-                  visible week by week, adjust any day inline, and persist the
+                  visible week by week, validate combination recipes against
+                  unlocked ingredients, adjust any day inline, and persist the
                   working plan in the browser.
                 </p>
               </div>
@@ -128,13 +136,14 @@ function App() {
                     Phase Status
                   </p>
                   <p className="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-stone-900">
-                    Phase 8 in app
+                    Phase 9 in app
                   </p>
                   <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
-                    Combination recipes are now modeled as first-class planner
-                    data. The app ships with {recipes.length} curated recipes,
-                    tracked ingredient IDs, and restriction flags that phase 9
-                    can validate before any combo is scheduled.
+                    Combination recipes now have a scheduling surface, shared
+                    eligibility checks, and rule-aware insertion into the same
+                    planner state as single-food items. The app ships with{" "}
+                    {recipes.length} curated recipes ready for day-by-day
+                    validation.
                   </p>
                 </div>
 
@@ -147,8 +156,11 @@ function App() {
                   </p>
                   <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
                     {scheduledFirstIntroductions} first introductions and{" "}
-                    {repeatCount} repeats currently occupy{" "}
+                    {repeatCount} repeat placements currently occupy{" "}
                     {firstIntroductionDays} intro days across the full plan.
+                    {combinationCount > 0
+                      ? ` ${combinationCount} combination recipes are also scheduled.`
+                      : ""}
                   </p>
                 </div>
               </div>
@@ -157,10 +169,11 @@ function App() {
         </header>
 
         <ValidationPanel days={days} />
+        <CombinationPlannerPanel days={days} onAddRecipe={addRecipeToDay} />
         <CalendarView
           days={days}
           onAddFood={addFoodToDay}
-          onRemoveFood={removeFoodFromDay}
+          onRemovePlannedItem={removePlannedItem}
         />
         <FoodLibraryPanel />
       </div>

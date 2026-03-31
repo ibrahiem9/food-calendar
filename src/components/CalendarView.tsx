@@ -158,12 +158,12 @@ function DayCell({
   day,
   days,
   onAddFood,
-  onRemoveFood,
+  onRemovePlannedItem,
 }: {
   day: DayEntry;
   days: DayEntry[];
   onAddFood: (date: string, foodId: string) => void;
-  onRemoveFood: (date: string, foodId: string) => void;
+  onRemovePlannedItem: (date: string, itemIndex: number) => void;
 }) {
   const parsedDate = parseISO(day.date);
   const [selectedFoodId, setSelectedFoodId] = useState("");
@@ -239,6 +239,7 @@ function DayCell({
           <ul className="mt-3 space-y-2">
             {day.items.map((item, index) => {
               const foodCategory = FOOD_CATEGORY_BY_ID[item.foodId] ?? "fruit";
+              const isCombination = item.type === "combination";
 
               return (
                 <li
@@ -252,25 +253,36 @@ function DayCell({
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <span
-                          className={`rounded-sm px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${CATEGORY_ACCENTS[foodCategory]}`}
+                          className={`rounded-sm px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${
+                            isCombination
+                              ? "bg-[#e5edf6] text-sky-900"
+                              : CATEGORY_ACCENTS[foodCategory]
+                          }`}
                         >
-                          {CATEGORY_LABELS[foodCategory]}
+                          {isCombination ? "Combination" : CATEGORY_LABELS[foodCategory]}
                         </span>
                         <span
                           className={`rounded-sm px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${
-                            item.isFirstIntroduction
-                              ? "bg-[#dfead9] text-stone-800"
-                              : "bg-[#ecefea] text-stone-600"
+                            isCombination
+                              ? "bg-[#edf2ec] text-stone-600"
+                              : item.isFirstIntroduction
+                                ? "bg-[#dfead9] text-stone-800"
+                                : "bg-[#ecefea] text-stone-600"
                           }`}
                         >
-                          {item.isFirstIntroduction ? "NEW" : "REPEAT"}
+                          {isCombination ? "Recipe" : item.isFirstIntroduction ? "NEW" : "REPEAT"}
                         </span>
+                        {isCombination && item.ingredientFoodIds ? (
+                          <span className="rounded-sm bg-[#edf2ec] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-600">
+                            {item.ingredientFoodIds.length} ingredients
+                          </span>
+                        ) : null}
                       </div>
                     </div>
 
                     <button
                       type="button"
-                      onClick={() => onRemoveFood(day.date, item.foodId)}
+                      onClick={() => onRemovePlannedItem(day.date, index)}
                       className="rounded-full bg-[#f5ddd4] px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-800 transition hover:bg-[#efcdbf]"
                     >
                       Remove
@@ -413,11 +425,11 @@ function DayCell({
 export function CalendarView({
   days,
   onAddFood,
-  onRemoveFood,
+  onRemovePlannedItem,
 }: {
   days: DayEntry[];
   onAddFood: (date: string, foodId: string) => void;
-  onRemoveFood: (date: string, foodId: string) => void;
+  onRemovePlannedItem: (date: string, itemIndex: number) => void;
 }) {
   const months = useMemo(() => groupDaysByMonth(days), [days]);
   const [activeMonthId, setActiveMonthId] = useState(months[0]?.id ?? "");
@@ -487,12 +499,12 @@ export function CalendarView({
             </p>
             <div className="space-y-2">
               <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Phase 6 calendar coverage across all {days.length} calendar days
+                Phase 9 calendar coverage across all {days.length} calendar days
               </h2>
               <p className="font-sans text-sm leading-7 text-stone-700">
-                Generated first introductions now share the same calendar as
-                manual edits, and empty dates are backfilled with repeat foods
-                that were introduced earlier in the timeline.
+                Single foods and validated combination recipes now live in the
+                same timeline, so manual edits, recipe planning, and automated
+                generation all surface through one rule-aware calendar.
               </p>
             </div>
           </div>
@@ -571,7 +583,7 @@ export function CalendarView({
                     day={day}
                     days={days}
                     onAddFood={onAddFood}
-                    onRemoveFood={onRemoveFood}
+                    onRemovePlannedItem={onRemovePlannedItem}
                   />
                 ))}
               </ul>

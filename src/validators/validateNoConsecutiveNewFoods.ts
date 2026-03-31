@@ -9,9 +9,11 @@ export const validateNoConsecutiveNewFoods = (days: DayEntry[], index: number) =
     return createValidationResult();
   }
 
-  const currentNewItems = day.items.filter((item) => item.isFirstIntroduction);
+  const currentNewItems = day.items.filter(
+    (item) => item.type === "single" && item.isFirstIntroduction,
+  );
   const previousNewItems = previousDay.items.filter(
-    (item) => item.isFirstIntroduction,
+    (item) => item.type === "single" && item.isFirstIntroduction,
   );
 
   if (currentNewItems.length === 0 || previousNewItems.length === 0) {
