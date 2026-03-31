@@ -36,3 +36,90 @@ textarea,
 select {
   font: inherit;
 }
+
+@media print {
+  @page {
+    size: portrait;
+    margin: 0.45in;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  body {
+    min-width: 0;
+    min-height: auto;
+    color: #111111;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  [data-print-root] {
+    background: #ffffff !important;
+    padding: 0 !important;
+  }
+
+  [data-print-hide],
+  .print-hidden {
+    display: none !important;
+  }
+
+  .print-calendar-shell,
+  .print-month-section,
+  .print-day-card,
+  .print-planned-items {
+    background: #ffffff !important;
+    color: #111111 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    border: 1px solid #c8c8c8 !important;
+  }
+
+  .print-calendar-shell {
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  .print-months-grid {
+    display: block !important;
+    gap: 0 !important;
+  }
+
+  .print-month-section {
+    break-after: page;
+    page-break-after: always;
+    margin: 0 0 0.3in 0 !important;
+    padding: 0.22in !important;
+  }
+
+  .print-month-section:last-child {
+    break-after: auto;
+    page-break-after: auto;
+    margin-bottom: 0 !important;
+  }
+
+  .print-month-days {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.16in !important;
+  }
+
+  .print-day-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    padding: 0.16in !important;
+  }
+
+  .print-planned-items {
+    margin-top: 0.14in !important;
+    padding: 0.14in !important;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    display: none !important;
+  }
+}

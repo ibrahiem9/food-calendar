@@ -102,10 +102,11 @@ Use this file to track your progress through the 18 phases.
   - All data properly formatted
   - Verification completed on 2026-03-31: `npm run build`
   
-- [ ] **Phase 14:** Print Layout & PDF Support
+- [x] **Phase 14:** Print Layout & PDF Support
   - Print stylesheet working
   - Month-per-page layout
   - Clean black & white output
+  - Verification completed on 2026-03-31: `npm run build`
   
 - [ ] **Phase 15:** Rules Summary Panel
   - All rules displayed with status

@@ -263,7 +263,7 @@ function DayCell({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`rounded-[1.5rem] bg-white/88 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)] transition ${
+      className={`rounded-[1.5rem] bg-white/88 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)] transition print-day-card ${
         isDropTarget ? "bg-[#eef5ea] ring-2 ring-[#9eb894]/60" : ""
       } ${selectedDayDate === day.date ? "ring-2 ring-[#7ea279]/70" : ""}`}
     >
@@ -292,7 +292,7 @@ function DayCell({
         </div>
       </div>
 
-      <div className="mt-4 rounded-[1.25rem] bg-[#eef2ed] p-3">
+      <div className="mt-4 rounded-[1.25rem] bg-[#eef2ed] p-3 print-planned-items">
         <div className="flex items-center justify-between gap-3">
           <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
             Planned Items
@@ -357,7 +357,7 @@ function DayCell({
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 print-hidden">
                       <button
                         type="button"
                         disabled={!inspectFoodId}
@@ -389,7 +389,7 @@ function DayCell({
                     </div>
                   </div>
 
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="mt-3 flex flex-wrap gap-2 print-hidden">
                     <button
                       type="button"
                       onClick={(event) => {
@@ -444,7 +444,7 @@ function DayCell({
         )}
       </div>
 
-      <div className="mt-4 rounded-[1.25rem] bg-[#f6f8f5] p-3">
+      <div className="mt-4 rounded-[1.25rem] bg-[#f6f8f5] p-3 print-hidden">
         <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
           Add Food
         </p>
@@ -499,7 +499,7 @@ function DayCell({
         </div>
       </div>
 
-      <div className="mt-4 rounded-[1.25rem] bg-[#f6f2ef] p-3">
+      <div className="mt-4 rounded-[1.25rem] bg-[#f6f2ef] p-3 print-hidden">
         <div className="flex items-center justify-between gap-3">
           <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
             Validation
@@ -537,7 +537,7 @@ function DayCell({
         )}
       </div>
 
-      <div className="mt-4 rounded-[1.25rem] bg-[#edf3ee] p-3">
+      <div className="mt-4 rounded-[1.25rem] bg-[#edf3ee] p-3 print-hidden">
         <div className="flex items-center justify-between gap-3">
           <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
             Allergen Week
@@ -652,9 +652,9 @@ export function CalendarView({
   };
 
   return (
-    <section className="rounded-[2rem] bg-[#f1f4f1] p-6 sm:p-7">
+    <section className="rounded-[2rem] bg-[#f1f4f1] p-6 sm:p-7 print-calendar-shell">
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between print-hidden">
           <div className="max-w-2xl space-y-3">
             <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
               Calendar Structure
@@ -712,18 +712,20 @@ export function CalendarView({
           </div>
         </div>
 
-        <MonthJumpNav
-          months={months}
-          activeMonthId={activeMonthId}
-          onJump={handleJump}
-        />
+        <div className="print-hidden">
+          <MonthJumpNav
+            months={months}
+            activeMonthId={activeMonthId}
+            onJump={handleJump}
+          />
+        </div>
 
-        <div className="grid gap-5">
+        <div className="grid gap-5 print-months-grid">
           {months.map((month) => (
             <article
               key={month.id}
               id={month.id}
-              className="rounded-[1.75rem] bg-[#e8eee8] p-5 sm:p-6"
+              className="rounded-[1.75rem] bg-[#e8eee8] p-5 sm:p-6 print-month-section"
             >
               <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
@@ -739,7 +741,7 @@ export function CalendarView({
                 </p>
               </div>
 
-              <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 print-month-days">
                 {month.days.map((day) => (
                   <DayCell
                     key={day.date}

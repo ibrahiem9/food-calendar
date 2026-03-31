@@ -148,6 +148,11 @@ function App() {
     );
   };
 
+  const handlePrint = () => {
+    window.print();
+    setSaveMessage("Opened print preview");
+  };
+
   const handleAddFood = (date: string, foodId: string) => {
     const result = requestAddFoodToDay(date, foodId);
 
@@ -215,9 +220,15 @@ function App() {
   };
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(152,196,255,0.2),_transparent_38%),linear-gradient(180deg,_#f8faf7_0%,_#edf3ee_100%)] px-5 py-8 text-stone-800 sm:px-8 sm:py-10">
+    <main
+      className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(152,196,255,0.2),_transparent_38%),linear-gradient(180deg,_#f8faf7_0%,_#edf3ee_100%)] px-5 py-8 text-stone-800 sm:px-8 sm:py-10"
+      data-print-root
+    >
       <div className="mx-auto flex max-w-7xl flex-col gap-8">
-        <header className="overflow-hidden rounded-[2rem] bg-white/80 p-6 shadow-[0_8px_32px_rgba(45,52,49,0.06)] ring-1 ring-white/60 backdrop-blur-xl sm:p-8">
+        <header
+          className="overflow-hidden rounded-[2rem] bg-white/80 p-6 shadow-[0_8px_32px_rgba(45,52,49,0.06)] ring-1 ring-white/60 backdrop-blur-xl sm:p-8"
+          data-print-hide
+        >
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl space-y-4">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.3em] text-sky-700/70">
@@ -270,6 +281,13 @@ function App() {
                 </button>
                 <button
                   type="button"
+                  onClick={handlePrint}
+                  className="rounded-full bg-[#e4ebe3] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#dae4d9]"
+                >
+                  Print
+                </button>
+                <button
+                  type="button"
                   onClick={undo}
                   disabled={!canUndo}
                   className="rounded-full bg-[#ecefe9] px-5 py-3 text-sm font-semibold text-stone-700 transition hover:bg-[#e3e7e1] disabled:cursor-not-allowed disabled:opacity-45"
@@ -297,7 +315,7 @@ function App() {
                     Phase Status
                   </p>
                   <p className="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-stone-900">
-                    Phase 13 in app
+                    Phase 14 in app
                   </p>
                   <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
                     The food library now shows live introduction status, weekly
@@ -305,8 +323,11 @@ function App() {
                     top of the Phase 10 conflict-aware editing and undo/redo
                     workflow. CSV export now captures date, foods, new
                     introductions, allergen presence, combination usage, and
-                    validation status alongside the {recipes.length} curated
-                    recipes already available on the same planner surface.
+                    validation status, while print mode strips the editing UI
+                    into a month-by-month planner layout that is ready for
+                    black-and-white PDF output alongside the {recipes.length}{" "}
+                    curated recipes already available on the same planner
+                    surface.
                   </p>
                 </div>
 
@@ -332,7 +353,10 @@ function App() {
         </header>
 
         {warningBanner ? (
-          <section className="rounded-[1.75rem] bg-[#f4e0d5] p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+          <section
+            className="rounded-[1.75rem] bg-[#f4e0d5] p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
+            data-print-hide
+          >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-600">
@@ -353,15 +377,21 @@ function App() {
           </section>
         ) : null}
 
-        <ValidationPanel days={days} />
-        <InspectorPanel
-          days={days}
-          selectedDayDate={inspectedDayDate}
-          selectedFoodId={inspectedFoodId}
-          onSelectDay={setInspectedDayDate}
-          onSelectFood={setInspectedFoodId}
-        />
-        <CombinationPlannerPanel days={days} onAddRecipe={addRecipeToDay} />
+        <div data-print-hide>
+          <ValidationPanel days={days} />
+        </div>
+        <div data-print-hide>
+          <InspectorPanel
+            days={days}
+            selectedDayDate={inspectedDayDate}
+            selectedFoodId={inspectedFoodId}
+            onSelectDay={setInspectedDayDate}
+            onSelectFood={setInspectedFoodId}
+          />
+        </div>
+        <div data-print-hide>
+          <CombinationPlannerPanel days={days} onAddRecipe={addRecipeToDay} />
+        </div>
         <CalendarView
           days={days}
           onAddFood={handleAddFood}
@@ -372,11 +402,13 @@ function App() {
           onSelectDay={setInspectedDayDate}
           onSelectFood={setInspectedFoodId}
         />
-        <FoodLibraryPanel
-          days={days}
-          selectedFoodId={inspectedFoodId}
-          onInspectFood={setInspectedFoodId}
-        />
+        <div data-print-hide>
+          <FoodLibraryPanel
+            days={days}
+            selectedFoodId={inspectedFoodId}
+            onInspectFood={setInspectedFoodId}
+          />
+        </div>
       </div>
       <ConflictResolutionModal
         conflict={pendingConflict}
