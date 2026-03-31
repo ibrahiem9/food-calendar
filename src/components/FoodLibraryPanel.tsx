@@ -207,7 +207,7 @@ export function FoodLibraryPanel({
             </p>
             <div className="space-y-2">
               <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Phase 11 library with live food status and drag-to-calendar
+                Food library with live status and drag-to-calendar
               </h2>
               <p className="font-sans text-sm leading-7 text-stone-700">
                 Search the catalog, narrow by category or status, and drag any

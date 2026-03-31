@@ -100,7 +100,7 @@ export function CombinationPlannerPanel({
             </p>
             <div className="space-y-2">
               <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Phase 9 recipe eligibility by calendar day
+                Recipe eligibility by calendar day
               </h2>
               <p className="font-sans text-sm leading-7 text-stone-700">
                 Combination foods stay blocked until May 1, 2026 and every

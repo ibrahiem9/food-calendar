@@ -31,13 +31,12 @@ export function ValidationPanel({ days }: { days: DayEntry[] }) {
             </p>
             <div className="space-y-2">
               <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Phase 10 rule feedback
+                Live rule feedback
               </h2>
               <p className="font-sans text-sm leading-7 text-stone-700">
-                Manual overrides now surface here immediately. Add, move, and
-                remove actions all re-run the same validators, so ingredient
-                unlock failures, cadence gaps, empty days, and spacing issues
-                stay visible before and after an override.
+                Every add, move, remove, and override action reruns the active
+                validators so spacing issues, cadence gaps, empty days, and
+                blocked combinations stay visible as you edit.
               </p>
             </div>
           </div>

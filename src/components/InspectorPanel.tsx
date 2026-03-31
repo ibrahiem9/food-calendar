@@ -368,7 +368,7 @@ export function InspectorPanel({
             </p>
             <div className="space-y-2">
               <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Phase 12 explanations for the selected day and food
+                Explanations for the selected day and food
               </h2>
               <p className="font-sans text-sm leading-7 text-stone-700">
                 Click any day card or food chip to inspect why it was placed, what rule buffers are active,

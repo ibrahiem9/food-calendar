@@ -662,13 +662,13 @@ export function CalendarView({
             </p>
             <div className="space-y-2">
               <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Phase 10 calendar editing across all {days.length} calendar days
+                Calendar editing across all {days.length} calendar days
               </h2>
               <p className="font-sans text-sm leading-7 text-stone-700">
-                Single foods and validated combination recipes still share one
-                timeline, and day cards now accept direct drops from the food
-                library while manual edits continue to route through conflict
-                checks, alternative date suggestions, and undoable history.
+                Single foods and validated recipes share one timeline. Day
+                cards accept direct drops from the food library, and manual
+                edits still route through conflict checks, alternative date
+                suggestions, and undoable history.
               </p>
             </div>
           </div>

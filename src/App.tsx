@@ -240,12 +240,11 @@ function App() {
                   BabyBite Calendar
                 </h1>
                 <p className="max-w-2xl font-sans text-sm leading-6 text-stone-700 sm:text-base">
-                  Manual planning and first-introduction generation now share
-                  the same rule-aware calendar. You can seed the full catalog,
-                  backfill empty dates with repeat foods, keep allergen cadence
-                  visible week by week, validate combination recipes against
-                  unlocked ingredients, adjust any day inline, and persist the
-                  working plan in the browser.
+                  Build and manage a baby food introduction plan with one
+                  rule-aware calendar. Generate first introductions, fill empty
+                  days with repeats, track weekly allergen maintenance, unlock
+                  recipes as ingredients are introduced, and adjust any day
+                  without losing validation context.
                 </p>
               </div>
             </div>
@@ -307,28 +306,23 @@ function App() {
 
               <div className="min-h-[1.5rem] font-sans text-sm text-stone-500">
                 {saveMessage ||
-                  "Generation auto-saves, fills every empty day, schedules allergen maintenance across Sunday-Saturday weeks, and exports the working plan as CSV."}
+                  "Generate a full plan, edit any day, keep allergens on cadence, and export the calendar when you are ready to share it."}
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-[1.5rem] bg-[#f1f4f1] p-4">
                   <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
-                    Phase Status
+                    Planner Overview
                   </p>
                   <p className="mt-2 font-display text-xl font-semibold tracking-[-0.02em] text-stone-900">
-                    Phase 15 in app
+                    Complete planning workspace
                   </p>
                   <p className="mt-2 font-sans text-sm leading-6 text-stone-600">
-                    The food library now shows live introduction status, weekly
-                    allergen due state, text search, and drag-to-calendar on
-                    top of the Phase 10 conflict-aware editing and undo/redo
-                    workflow. CSV export now captures date, foods, new
-                    introductions, allergen presence, combination usage, and
-                    validation status, print mode strips the editing UI into a
-                    month-by-month planner layout, and the new rules summary
-                    panel links each active constraint directly back to the
-                    affected day cards alongside the {recipes.length} curated
-                    recipes already available on the same planner surface.
+                    The planner combines calendar editing, live rule checks,
+                    recipe eligibility, CSV export, print support, drag from
+                    the food library, and undo/redo in one surface. {recipes.length} curated
+                    recipes are available once their ingredients have been
+                    introduced.
                   </p>
                 </div>
 

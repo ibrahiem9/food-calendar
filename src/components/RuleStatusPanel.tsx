@@ -247,7 +247,7 @@ export function RuleStatusPanel({
             </p>
             <div className="space-y-2">
               <h2 className="font-display text-3xl font-semibold tracking-[-0.03em] text-stone-900">
-                Phase 15 compliance dashboard
+                Compliance dashboard
               </h2>
               <p className="font-sans text-sm leading-7 text-stone-700">
                 Each planning rule now reports live pass or fail state with direct
