@@ -96,9 +96,9 @@ export function CombinationPlannerPanel({
   };
 
   return (
-    <section className="rounded-[2rem] bg-[#eff3f6] p-5 sm:p-6">
-      <div className="grid gap-5 xl:grid-cols-[21rem_minmax(0,1fr)]">
-        <aside className="space-y-4">
+    <section className="rounded-[2rem] bg-[#eff3f6] p-5 sm:p-6 lg:p-7">
+      <div className="grid gap-6 xl:grid-cols-[21rem_minmax(0,1fr)]">
+        <aside className="space-y-5">
           <div
             className={`overflow-hidden rounded-[1.7rem] bg-gradient-to-br ${recipeHeroVisual.accentClassName} p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]`}
           >
@@ -118,7 +118,7 @@ export function CombinationPlannerPanel({
             </p>
           </div>
 
-          <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+          <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] sm:p-5">
             <label className="space-y-2">
               <span className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
                 Plan combinations on
@@ -136,7 +136,7 @@ export function CombinationPlannerPanel({
               </select>
             </label>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
               <div className="rounded-[1rem] bg-[#eef2ed] px-3 py-3">
                 <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
                   Selected day
@@ -161,7 +161,7 @@ export function CombinationPlannerPanel({
             </p>
           </div>
 
-          <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+          <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] sm:p-5">
             <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
               Ingredient sets
             </p>
@@ -182,9 +182,9 @@ export function CombinationPlannerPanel({
           </div>
         </aside>
 
-        <div className="space-y-5">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                 Earliest combo gate
               </p>
@@ -192,7 +192,7 @@ export function CombinationPlannerPanel({
                 May 1, 2026
               </p>
             </div>
-            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                 Eligible recipes
               </p>
@@ -200,7 +200,7 @@ export function CombinationPlannerPanel({
                 {eligibleCount}/{recipes.length}
               </p>
             </div>
-            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                 Already planned
               </p>

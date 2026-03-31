@@ -258,8 +258,8 @@ export function RuleStatusPanel({
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-[1.5rem] bg-white/80 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-[1.5rem] bg-white/80 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
                 Compliance Score
               </p>
@@ -268,7 +268,7 @@ export function RuleStatusPanel({
               </p>
             </div>
 
-            <div className="rounded-[1.5rem] bg-[#dfead9] p-4">
+            <div className="rounded-[1.5rem] bg-[#dfead9] p-4 sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">
                 Rules Passing
               </p>
@@ -277,7 +277,7 @@ export function RuleStatusPanel({
               </p>
             </div>
 
-            <div className="rounded-[1.5rem] bg-[#f7e3d4] p-4">
+            <div className="rounded-[1.5rem] bg-[#f7e3d4] p-4 sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.22em] text-stone-600">
                 Valid Days
               </p>

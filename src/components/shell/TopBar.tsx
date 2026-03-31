@@ -22,8 +22,8 @@ export function TopBar({
   actionSlot: ReactNode;
 }) {
   return (
-    <header className="rounded-[2rem] bg-white/74 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl">
-      <div className="flex flex-col gap-4">
+    <header className="rounded-[2rem] bg-white/74 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl sm:p-5">
+      <div className="flex flex-col gap-5">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
@@ -44,11 +44,11 @@ export function TopBar({
             </div>
           </div>
 
-          <div className="hidden xl:flex">{actionSlot}</div>
+          <div className="hidden xl:block xl:max-w-[52rem]">{actionSlot}</div>
         </div>
 
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <nav className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <nav className="flex flex-wrap gap-2.5">
             {items.map((item) => {
               const isActive = item.id === activeView;
 
@@ -69,7 +69,9 @@ export function TopBar({
             })}
           </nav>
 
-          <p className="font-sans text-sm text-stone-500">{statusMessage}</p>
+          <p className="max-w-2xl font-sans text-sm leading-6 text-stone-500">
+            {statusMessage}
+          </p>
         </div>
 
         <div className="xl:hidden">{actionSlot}</div>

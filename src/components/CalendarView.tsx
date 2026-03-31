@@ -85,7 +85,7 @@ function DayCell({
       onDragOver={handleDragOver}
       onDragLeave={() => setIsDropTarget(false)}
       onDrop={handleDrop}
-      className={`min-h-[13rem] rounded-[1.5rem] p-4 text-left shadow-[0_8px_32px_rgba(45,52,49,0.04)] transition print-day-card ${
+      className={`flex min-h-[13.75rem] h-full flex-col rounded-[1.5rem] p-4 text-left shadow-[0_8px_32px_rgba(45,52,49,0.04)] transition print-day-card ${
         selectedDayDate === day.date
           ? "bg-[#f7faf4] ring-2 ring-[#7ea279]/70"
           : "bg-white/88 hover:bg-white"
@@ -111,7 +111,7 @@ function DayCell({
         </span>
       </div>
 
-      <div className="mt-4 flex items-center gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-[#edf2ec] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-stone-600">
           {day.items.length} item{day.items.length === 1 ? "" : "s"}
         </span>
@@ -122,7 +122,7 @@ function DayCell({
         ) : null}
       </div>
 
-      <div className="mt-4 space-y-2 print-planned-items">
+      <div className="mt-4 flex-1 space-y-2.5 print-planned-items">
         {previewItems.length > 0 ? (
           previewItems.map((item, index) => {
             const visual = getFoodVisual(item.foodId);
@@ -130,7 +130,7 @@ function DayCell({
             return (
               <div
                 key={`${day.date}-${item.foodId}-${index}`}
-                className="flex items-center gap-3 rounded-[1rem] bg-[#f5f7f3] px-3 py-3"
+                className="flex items-start gap-3 rounded-[1rem] bg-[#f5f7f3] px-3 py-3"
               >
                 <div
                   className={`h-11 w-11 shrink-0 rounded-[0.9rem] bg-gradient-to-br ${visual.accentClassName} p-1.5`}
@@ -142,11 +142,11 @@ function DayCell({
                     className="h-full w-full rounded-[0.7rem] object-cover"
                   />
                 </div>
-                <div className="min-w-0">
-                  <p className="truncate font-sans text-sm font-medium text-stone-900">
+                <div className="min-w-0 flex-1">
+                  <p className="font-sans text-sm font-medium leading-5 text-stone-900 break-words">
                     {item.label}
                   </p>
-                  <p className="font-sans text-xs uppercase tracking-[0.14em] text-stone-500">
+                  <p className="mt-1 font-sans text-[11px] uppercase tracking-[0.12em] text-stone-500">
                     {item.type === "combination"
                       ? "Recipe"
                       : item.isFirstIntroduction
@@ -173,7 +173,7 @@ function DayCell({
       </div>
 
       <div className="mt-4 rounded-[1rem] bg-[#eef2ed] px-3 py-3">
-        <p className="font-sans text-xs uppercase tracking-[0.14em] text-stone-500">
+        <p className="font-sans text-xs uppercase tracking-[0.12em] text-stone-500">
           {isDropTarget
             ? "Release to place dragged food"
             : selectedDayDate === day.date
@@ -242,13 +242,16 @@ export function CalendarView({
     .slice(0, 3)
     .map((item) => FOOD_NAME_BY_ID.get(item.foodId) ?? item.label)
     .join(", ");
+  const dayGridTemplateColumns = `repeat(auto-fit, minmax(min(100%, ${
+    viewMode === "week" || visibleDays.length <= 5 ? "15.5rem" : "13.5rem"
+  }), 1fr))`;
 
   return (
-    <section className="rounded-[2rem] bg-[#f1f4f1] p-5 print-calendar-shell sm:p-6">
-      <div className="flex flex-col gap-5">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-[1.4rem] bg-white/84 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+    <section className="rounded-[2rem] bg-[#f1f4f1] p-5 print-calendar-shell sm:p-6 lg:p-7">
+      <div className="flex flex-col gap-6">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-[1.4rem] bg-white/84 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                 Timeline
               </p>
@@ -260,7 +263,7 @@ export function CalendarView({
               </p>
             </div>
 
-            <div className="rounded-[1.4rem] bg-white/84 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+            <div className="rounded-[1.4rem] bg-white/84 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                 New vs Repeat
               </p>
@@ -272,7 +275,7 @@ export function CalendarView({
               </p>
             </div>
 
-            <div className="rounded-[1.4rem] bg-[#e8f0f8] p-4">
+            <div className="rounded-[1.4rem] bg-[#e8f0f8] p-4 sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-sky-900/70">
                 Selected day
               </p>
@@ -285,7 +288,7 @@ export function CalendarView({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-start gap-2">
+          <div className="flex flex-wrap items-start gap-2.5">
             <button
               type="button"
               onClick={() => setViewMode("month")}
@@ -311,7 +314,7 @@ export function CalendarView({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2.5">
           {months.map((month) => {
             const isActive = month.id === activeMonthId;
 
@@ -333,7 +336,7 @@ export function CalendarView({
         </div>
 
         {activeMonth ? (
-          <article className="rounded-[1.75rem] bg-[#e8eee8] p-4 sm:p-5 print-month-section">
+          <article className="rounded-[1.75rem] bg-[#e8eee8] p-4 sm:p-5 lg:p-6 print-month-section">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
@@ -348,7 +351,7 @@ export function CalendarView({
               </p>
             </div>
 
-            <div className="mt-5 grid grid-cols-2 gap-2 text-center sm:grid-cols-4 lg:grid-cols-7">
+            <div className="mt-6 grid grid-cols-2 gap-2.5 text-center sm:grid-cols-4 lg:grid-cols-7">
               {WEEKDAY_LABELS.map((label) => (
                 <div
                   key={label}
@@ -359,7 +362,10 @@ export function CalendarView({
               ))}
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 print-month-days">
+            <div
+              className="mt-5 grid gap-3.5 print-month-days"
+              style={{ gridTemplateColumns: dayGridTemplateColumns }}
+            >
               {visibleDays.map((day) => (
                 <DayCell
                   key={day.date}

@@ -158,7 +158,7 @@ function App() {
     ? saveMessage
     : `Coverage ${populatedDays}/${days.length || 0} days, ${scheduledFirstIntroductions} intros, ${repeatCount} repeats${combinationCount > 0 ? `, ${combinationCount} recipes` : ""}.`;
 
-  const primaryAction = (
+  const renderPrimaryAction = (fullWidth = false) => (
     <button
       type="button"
       onClick={() => {
@@ -171,15 +171,15 @@ function App() {
             : `Generated ${summary.populatedDayCount} populated days. ${summary.unscheduledFoodIds.length} foods could not be introduced.`,
         );
       }}
-      className="w-full rounded-full bg-[linear-gradient(135deg,_#7ea279,_#b9cfa8)] px-5 py-3 text-sm font-semibold text-stone-900 shadow-[0_8px_32px_rgba(45,52,49,0.06)] transition hover:brightness-[1.02]"
+      className={`${fullWidth ? "w-full" : "w-full sm:w-auto"} rounded-full bg-[linear-gradient(135deg,_#7ea279,_#b9cfa8)] px-5 py-3 text-sm font-semibold text-stone-900 shadow-[0_8px_32px_rgba(45,52,49,0.06)] transition hover:brightness-[1.02]`}
     >
       Generate Calendar
     </button>
   );
 
   const actionBar = (
-    <div className="flex flex-wrap gap-2">
-      {primaryAction}
+    <div className="flex flex-wrap items-stretch gap-2.5 sm:gap-3">
+      {renderPrimaryAction()}
       <button
         type="button"
         onClick={() => {
@@ -361,10 +361,10 @@ function App() {
           setMobileInspectorOpen(false);
         }}
         onClose={() => setMobileNavOpen(false)}
-        actionSlot={primaryAction}
+        actionSlot={renderPrimaryAction(true)}
       />
 
-      <div className="mx-auto flex max-w-[1600px] gap-4">
+      <div className="mx-auto flex max-w-[1600px] gap-5 xl:gap-6">
         <SidebarNav
           items={NAV_ITEMS.map((item) => ({ ...item, icon: <span>{item.icon}</span> }))}
           activeView={activeView}
@@ -372,10 +372,10 @@ function App() {
             setActiveView(view);
             setMobileInspectorOpen(false);
           }}
-          primaryAction={primaryAction}
+          primaryAction={renderPrimaryAction(true)}
         />
 
-        <div className="min-w-0 flex-1 space-y-4">
+        <div className="min-w-0 flex-1 space-y-5">
           <TopBar
             items={NAV_ITEMS}
             activeView={activeView}
@@ -390,7 +390,7 @@ function App() {
 
           {warningBanner ? (
             <section
-              className="rounded-[1.75rem] bg-[#f4e0d5] p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
+              className="rounded-[1.75rem] bg-[#f4e0d5] p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)] sm:p-6"
               data-print-hide
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -418,7 +418,7 @@ function App() {
               <button
                 type="button"
                 onClick={() => setMobileInspectorOpen((current) => !current)}
-                className="w-full rounded-[1.6rem] bg-white/78 px-5 py-4 text-left shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
+                className="w-full rounded-[1.6rem] bg-white/78 px-5 py-4 text-left shadow-[0_8px_32px_rgba(45,52,49,0.06)] sm:px-6"
               >
                 <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                   Inspector
@@ -433,7 +433,11 @@ function App() {
             </div>
           )}
 
-          <div className={`grid gap-4 ${showInspector ? "xl:grid-cols-[minmax(0,1fr)_24rem]" : ""}`}>
+          <div
+            className={`grid gap-5 xl:gap-6 ${
+              showInspector ? "xl:grid-cols-[minmax(0,1fr)_24rem]" : ""
+            }`}
+          >
             <div className="min-w-0">{mainWorkspace}</div>
 
             {showInspector ? (
@@ -458,8 +462,8 @@ function App() {
             ) : null}
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3" data-print-hide>
-            <div className="rounded-[1.5rem] bg-white/76 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
+          <div className="grid gap-4 lg:gap-5 sm:grid-cols-3" data-print-hide>
+            <div className="rounded-[1.5rem] bg-white/76 p-5 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                 Planner overview
               </p>
@@ -470,7 +474,7 @@ function App() {
                 Desktop keeps the sidebar and top bar persistent while mobile shifts navigation and secondary controls into drawers.
               </p>
             </div>
-            <div className="rounded-[1.5rem] bg-white/76 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
+            <div className="rounded-[1.5rem] bg-white/76 p-5 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                 Calendar coverage
               </p>
@@ -481,7 +485,7 @@ function App() {
                 {scheduledFirstIntroductions} first introductions with {repeatCount} repeats and {recipes.length} curated recipes available.
               </p>
             </div>
-            <div className="rounded-[1.5rem] bg-white/76 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
+            <div className="rounded-[1.5rem] bg-white/76 p-5 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                 Selected food
               </p>

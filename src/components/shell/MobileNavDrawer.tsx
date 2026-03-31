@@ -35,7 +35,7 @@ export function MobileNavDrawer({
         onClick={onClose}
         className="absolute inset-0 bg-stone-900/30"
       />
-      <div className="absolute left-4 right-4 top-4 rounded-[2rem] bg-white/80 p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-[20px]">
+      <div className="absolute left-4 right-4 top-4 max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[2rem] bg-white/80 p-5 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-[20px]">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-500">
@@ -86,7 +86,7 @@ export function MobileNavDrawer({
           })}
         </div>
 
-        <div className="mt-5">{actionSlot}</div>
+        <div className="mt-6">{actionSlot}</div>
       </div>
     </div>
   );

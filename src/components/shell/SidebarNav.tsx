@@ -20,7 +20,7 @@ export function SidebarNav({
   primaryAction: ReactNode;
 }) {
   return (
-    <aside className="hidden min-h-[calc(100vh-3rem)] w-[18rem] flex-col rounded-[2rem] bg-white/76 p-6 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl xl:flex">
+    <aside className="hidden min-h-[calc(100vh-3rem)] w-[18.5rem] flex-col rounded-[2rem] bg-white/76 p-6 shadow-[0_8px_32px_rgba(45,52,49,0.06)] backdrop-blur-xl xl:flex">
       <div className="rounded-[1.75rem] bg-[linear-gradient(145deg,_#f4f7f2,_#ebf1ea)] p-5">
         <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-500">
           BabyBite Calendar
@@ -52,7 +52,7 @@ export function SidebarNav({
         </div>
       </div>
 
-      <nav className="mt-6 space-y-2">
+      <nav className="mt-6 space-y-2.5">
         {items.map((item) => {
           const isActive = item.id === activeView;
 
@@ -83,7 +83,7 @@ export function SidebarNav({
         })}
       </nav>
 
-      <div className="mt-6">{primaryAction}</div>
+      <div className="mt-7">{primaryAction}</div>
 
       <div className="mt-auto rounded-[1.5rem] bg-[#eff3f6] p-4">
         <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">

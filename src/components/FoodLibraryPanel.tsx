@@ -244,9 +244,9 @@ export function FoodLibraryPanel({
   );
 
   return (
-    <section className="rounded-[2rem] bg-[#f1f4f1] p-5 sm:p-6">
-      <div className="flex flex-col gap-6">
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
+    <section className="rounded-[2rem] bg-[#f1f4f1] p-5 sm:p-6 lg:p-7">
+      <div className="flex flex-col gap-7">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(19rem,0.75fr)]">
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {FOOD_CATEGORIES.map((category) => (
               <FeaturedCategoryCard
@@ -257,8 +257,8 @@ export function FoodLibraryPanel({
             ))}
           </div>
 
-          <div className="grid gap-3">
-            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+          <div className="grid gap-3.5">
+            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                 Visible foods
               </p>
@@ -270,7 +270,7 @@ export function FoodLibraryPanel({
               </p>
             </div>
 
-            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)]">
+            <div className="rounded-[1.5rem] bg-white/82 p-4 shadow-[0_8px_32px_rgba(45,52,49,0.06)] sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                 Weekly allergen pulse
               </p>
@@ -282,7 +282,7 @@ export function FoodLibraryPanel({
               </p>
             </div>
 
-            <div className="rounded-[1.5rem] bg-[#edf2ec] p-4">
+            <div className="rounded-[1.5rem] bg-[#edf2ec] p-4 sm:p-5">
               <p className="font-sans text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
                 Drag workflow
               </p>
@@ -293,8 +293,8 @@ export function FoodLibraryPanel({
           </div>
         </div>
 
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_auto_auto]">
-          <label className="rounded-[1.5rem] bg-white/78 px-4 py-3 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+          <label className="rounded-[1.5rem] bg-white/78 px-4 py-3.5 shadow-[0_8px_32px_rgba(45,52,49,0.04)]">
             <span className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
               Search foods
             </span>
@@ -307,46 +307,58 @@ export function FoodLibraryPanel({
             />
           </label>
 
-          <div className="flex flex-wrap gap-2">
-            {FILTER_OPTIONS.map((option) => {
-              const isActive = option.value === activeFilter;
+          <div className="grid gap-4">
+            <div className="space-y-2.5">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                Category
+              </p>
+              <div className="flex flex-wrap gap-2.5">
+                {FILTER_OPTIONS.map((option) => {
+                  const isActive = option.value === activeFilter;
 
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setActiveFilter(option.value)}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    isActive
-                      ? "bg-[linear-gradient(135deg,_#1a61a4,_#98c4ff)] text-white shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
-                      : "bg-white/78 text-stone-700"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setActiveFilter(option.value)}
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                        isActive
+                          ? "bg-[linear-gradient(135deg,_#1a61a4,_#98c4ff)] text-white shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
+                          : "bg-white/78 text-stone-700"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-          <div className="flex flex-wrap gap-2">
-            {STATUS_OPTIONS.map((option) => {
-              const isActive = option.value === activeStatus;
+            <div className="space-y-2.5">
+              <p className="font-sans text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                Status
+              </p>
+              <div className="flex flex-wrap gap-2.5">
+                {STATUS_OPTIONS.map((option) => {
+                  const isActive = option.value === activeStatus;
 
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setActiveStatus(option.value)}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    isActive
-                      ? "bg-[linear-gradient(135deg,_#7ea279,_#b9cfa8)] text-stone-900 shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
-                      : "bg-white/78 text-stone-700"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setActiveStatus(option.value)}
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                        isActive
+                          ? "bg-[linear-gradient(135deg,_#7ea279,_#b9cfa8)] text-stone-900 shadow-[0_8px_32px_rgba(45,52,49,0.06)]"
+                          : "bg-white/78 text-stone-700"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -396,7 +408,7 @@ export function FoodLibraryPanel({
                   ) : null}
                 </div>
 
-                <ul className="mt-5 grid gap-3">
+                <ul className="mt-5 grid gap-3.5">
                   {section.foods.map((food) => {
                     const status = statusByFoodId.get(food.id);
 
